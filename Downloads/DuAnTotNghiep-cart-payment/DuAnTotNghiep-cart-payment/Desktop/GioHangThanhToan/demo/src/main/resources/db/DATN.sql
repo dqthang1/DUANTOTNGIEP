@@ -569,8 +569,6 @@ WHEN NOT MATCHED THEN INSERT (ten) VALUES (S.ten);
 -- 3.5 Người dùng (key = email)
 MERGE dbo.nguoi_dung AS T
 USING (VALUES
-    (N'Admin User', N'admin@activewear.com', N'admin123', N'0123456789', N'Admin',       N'123 Đường ABC, Quận 1, TP.HCM', N'Nam', N'1990-01-01', N'TP.HCM'),
-    (N'Admin LV', N'thelvph50187@gmail.com', N'admin123', N'0123456789', N'Admin', N'456 Đường Admin, Quận 1, TP.HCM', N'Nam', N'1990-01-01', N'TP.HCM'),
     (N'Nguyễn Văn A', N'nguyenvana@gmail.com', N'123456', N'0987654321', N'Khách hàng', N'456 Đường XYZ, Quận 2, TP.HCM', N'Nam', N'1995-05-15', N'TP.HCM'),
     (N'Trần Thị B',   N'tranthib@gmail.com',  N'123456', N'0912345678', N'Khách hàng', N'789 Đường DEF, Quận 3, TP.HCM', N'Nữ',  N'1998-08-20', N'TP.HCM')
 ) AS S(ten, email, mat_khau, sdt, ten_vai_tro, dia_chi, gioi_tinh, ngay_sinh, thanh_pho)
