@@ -760,6 +760,12 @@
 		[gia_tri] [decimal](19, 4) NOT NULL,
 		[so_luong] [int] NOT NULL DEFAULT (0),
 		[mo_ta] [nvarchar](500) NULL,
+		-- Thêm các cột liên kết
+		[san_pham_id] [bigint] NULL,
+		[danh_muc_id] [bigint] NULL,
+		[thuong_hieu_id] [bigint] NULL,
+		[don_hang_id] [bigint] NULL,
+		[nguoi_dung_id] [bigint] NULL,
 		[ngay_tao] [datetime2](0) NOT NULL DEFAULT (SYSUTCDATETIME()),
 	CONSTRAINT [PK_thong_ke] PRIMARY KEY CLUSTERED ([id] ASC)
 	);
@@ -1052,6 +1058,27 @@
 		ALTER TABLE dbo.khuyen_mai_ap_dung ADD CONSTRAINT FK_khuyen_mai_ap_dung_ma_giam_gia 
 		FOREIGN KEY (ma_giam_gia_id) REFERENCES dbo.ma_giam_gia(id);
 
+	-- Thong ke foreign keys
+	IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_thong_ke_san_pham')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT FK_thong_ke_san_pham 
+		FOREIGN KEY (san_pham_id) REFERENCES dbo.san_pham(id) ON DELETE SET NULL;
+
+	IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_thong_ke_danh_muc')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT FK_thong_ke_danh_muc 
+		FOREIGN KEY (danh_muc_id) REFERENCES dbo.danh_muc(id) ON DELETE SET NULL;
+
+	IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_thong_ke_thuong_hieu')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT FK_thong_ke_thuong_hieu 
+		FOREIGN KEY (thuong_hieu_id) REFERENCES dbo.thuong_hieu(id) ON DELETE SET NULL;
+
+	IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_thong_ke_don_hang')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT FK_thong_ke_don_hang 
+		FOREIGN KEY (don_hang_id) REFERENCES dbo.don_hang(id) ON DELETE SET NULL;
+
+	IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_thong_ke_nguoi_dung')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT FK_thong_ke_nguoi_dung 
+		FOREIGN KEY (nguoi_dung_id) REFERENCES dbo.nguoi_dung(id) ON DELETE SET NULL;
+
 	----------------------------------------------------------
 	-- 2.2) DATA CORRECTNESS FIXES - ƯU TIÊN CAO
 	----------------------------------------------------------
@@ -1176,6 +1203,25 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_sp_active_price')
 
 	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_kmad_mgg')
 		CREATE NONCLUSTERED INDEX IX_kmad_mgg ON dbo.khuyen_mai_ap_dung(ma_giam_gia_id);
+
+	-- Thong ke indexes
+	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_thong_ke_ngay_loai')
+		CREATE NONCLUSTERED INDEX IX_thong_ke_ngay_loai ON dbo.thong_ke(ngay, loai_thong_ke);
+
+	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_thong_ke_san_pham')
+		CREATE NONCLUSTERED INDEX IX_thong_ke_san_pham ON dbo.thong_ke(san_pham_id);
+
+	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_thong_ke_danh_muc')
+		CREATE NONCLUSTERED INDEX IX_thong_ke_danh_muc ON dbo.thong_ke(danh_muc_id);
+
+	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_thong_ke_thuong_hieu')
+		CREATE NONCLUSTERED INDEX IX_thong_ke_thuong_hieu ON dbo.thong_ke(thuong_hieu_id);
+
+	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_thong_ke_don_hang')
+		CREATE NONCLUSTERED INDEX IX_thong_ke_don_hang ON dbo.thong_ke(don_hang_id);
+
+	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_thong_ke_nguoi_dung')
+		CREATE NONCLUSTERED INDEX IX_thong_ke_nguoi_dung ON dbo.thong_ke(nguoi_dung_id);
 
 	-- Sản phẩm khuyến mãi
 	IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_spkm_sp')
@@ -1418,9 +1464,22 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='UQ_otp_active_email_type')
 
 	IF OBJECT_ID(N'dbo.danh_gia', N'U') IS NOT NULL
 	BEGIN
-		IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE name='CK_danh_gia_trang_thai')
-			ALTER TABLE dbo.danh_gia ADD CONSTRAINT CK_danh_gia_trang_thai
-			CHECK (trang_thai IN (N'CHO_DUYET',N'DA_DUYET',N'TU_CHOI',N'AN'));
+	IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE name='CK_danh_gia_trang_thai')
+		ALTER TABLE dbo.danh_gia ADD CONSTRAINT CK_danh_gia_trang_thai
+		CHECK (trang_thai IN (N'CHO_DUYET',N'DA_DUYET',N'TU_CHOI',N'AN'));
+
+	-- Thong ke constraints
+	IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE name='CK_thong_ke_loai')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT CK_thong_ke_loai
+		CHECK (loai_thong_ke IN (N'DOANH_THU',N'SO_LUONG_BAN',N'DON_HANG',N'KHACH_HANG',N'SAN_PHAM',N'DANH_MUC',N'THUONG_HIEU',N'KHUYEN_MAI'));
+
+	IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE name='CK_thong_ke_gia_tri')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT CK_thong_ke_gia_tri
+		CHECK (gia_tri >= 0);
+
+	IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE name='CK_thong_ke_so_luong')
+		ALTER TABLE dbo.thong_ke ADD CONSTRAINT CK_thong_ke_so_luong
+		CHECK (so_luong >= 0);
 	END
 
 
