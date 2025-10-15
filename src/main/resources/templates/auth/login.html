@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - Activewear</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Đăng nhập</h1>
+        <p class="subtitle">Chào mừng bạn đến với Activewear</p>
+
+        <div th:if="${param.error}" class="alert error">
+            Email hoặc mật khẩu không chính xác!
+        </div>
+        <div th:if="${param.logout}" class="alert success">
+            Bạn đã đăng xuất thành công.
+        </div>
+        <div th:if="${param.registered}" class="alert success">
+            Đăng ký thành công! Vui lòng đăng nhập.
+        </div>
+
+        <form th:action="@{/auth/login}" method="post">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Nhập email" required>
+            </div>
+
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" placeholder="Nhập mật khẩu" required>
+            </div>
+
+            <button type="submit" class="btn">Đăng nhập</button>
+
+            <hr style="margin: 20px 0;">
+
+            <div style="text-align: center;">
+                <a href="/oauth2/authorization/google" class="btn btn-google" style="
+                    display: inline-block;
+                    background-color: #DB4437;
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    font-weight: bold;
+                ">
+                    <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google"
+                         style="width:20px; vertical-align:middle; margin-right:8px;">
+                    Đăng nhập bằng Google
+                </a>
+            </div>
+
+        </form>
+
+        <p class="switch-link">Chưa có tài khoản?
+            <a th:href="@{/auth/register}">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

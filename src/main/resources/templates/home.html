@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Activewear - Trang chủ</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- USER MENU --- */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-trigger {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            color: #333;
+            min-width: 160px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .user-menu:hover .user-dropdown,
+        .user-dropdown:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown a,
+        .user-dropdown button {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+        .user-dropdown a:hover,
+        .user-dropdown button:hover {
+            background-color: #f4f4f4;
+        }
+
+        .user-info {
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed;
+            top: 70px; /* Dưới header */
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        /* --- CONTENT --- */
+        .container {
+            padding: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        h2 {
+            border-left: 5px solid #4CAF50;
+            padding-left: 10px;
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 5px 0;
+        }
+
+        ul li a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background: #222;
+            color: #ccc;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🏃‍♀️ Activewear</h1>
+    <nav>
+        <!-- Nếu CHƯA đăng nhập -->
+        <div sec:authorize="!isAuthenticated()">
+            <a th:href="@{/}">Trang chủ</a>
+            <a th:href="@{/auth/login}">Đăng nhập</a>
+            <a th:href="@{/auth/register}">Đăng ký</a>
+            <a th:href="@{/cart}">Giỏ hàng</a>
+        </div>
+
+        <!-- Nếu ĐÃ đăng nhập -->
+        <div sec:authorize="isAuthenticated()" class="user-info">
+            <a th:href="@{/cart}" style="color:white; margin-right:20px;">🛒 Giỏ hàng</a>
+            <div class="user-menu">
+                <div class="user-trigger">
+                    <img th:src="${currentUser != null && currentUser.avatarUrl != null ? currentUser.avatarUrl : '/images/default-avatar.png'}"
+                         class="user-avatar">
+                    <span th:text="${currentUser != null ? currentUser.ten : 'Người dùng'}"></span>
+                </div>
+                <div class="user-dropdown">
+                    <a th:href="@{/profile}">Thông tin cá nhân</a>
+                    <form th:action="@{/auth/logout}" method="post" style="margin:0;">
+                        <button type="submit">Đăng xuất</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Toast thông báo -->
+<div id="loginToast" class="toast">Đăng nhập thành công! 👋</div>
+<div id="logoutToast" class="toast error">Đăng xuất thành công!</div>
+
+<div class="container">
+    <h2 style="text-align:center; margin-top:40px;">Chào mừng đến với <span style="color:#4CAF50;">Activewear</span>!</h2>
+    <p style="text-align:center;">Mua sắm áo thể thao thời trang, năng động và chất lượng cao.</p>
+    <hr/>
+
+    <!-- Các mục nội dung (sản phẩm, khách hàng, v.v.) -->
+    <div class="section">
+        <h2>🧥 Quản lý sản phẩm</h2>
+        <ul>
+            <li><a th:href="@{/product/add}">Thêm mới sản phẩm</a></li>
+            <li><a th:href="@{/product/list}">Danh sách & danh mục sản phẩm</a></li>
+            <li><a th:href="@{/product/search}">Tìm kiếm & lọc sản phẩm</a></li>
+            <li><a th:href="@{/inventory}">Quản lý tồn kho</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🛒 Giỏ hàng & Thanh toán</h2>
+        <ul>
+            <li><a th:href="@{/cart}">Xem giỏ hàng</a></li>
+            <li><a th:href="@{/checkout}">Thanh toán (Checkout)</a></li>
+            <li><a th:href="@{/order/history}">Lịch sử đơn hàng</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>👤 Quản lý khách hàng</h2>
+        <ul>
+            <li><a th:href="@{/auth/register}">Đăng ký tài khoản khách hàng</a></li>
+            <li><a th:href="@{/profile}">Cập nhật thông tin cá nhân</a></li>
+            <li><a th:href="@{/address}">Quản lý địa chỉ giao hàng</a></li>
+            <li><a th:href="@{/customer/list}">Danh sách khách hàng</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🎟️ Quản lý chương trình giảm giá</h2>
+        <ul>
+            <li><a th:href="@{/discount/add}">Tạo chương trình giảm giá</a></li>
+            <li><a th:href="@{/discount/list}">Danh sách mã giảm giá</a></li>
+            <li><a th:href="@{/discount/stats}">Thống kê hiệu quả giảm giá</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>📊 Quản trị & Báo cáo</h2>
+        <ul>
+            <li><a th:href="@{/admin/dashboard}">Dashboard tổng hợp</a></li>
+            <li><a th:href="@{/report/orders}">Thống kê đơn hàng</a></li>
+            <li><a th:href="@{/report/revenue}">Báo cáo doanh thu</a></li>
+            <li><a th:href="@{/report/customers}">Top khách hàng mua nhiều</a></li>
+        </ul>
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 Activewear. All rights reserved. | Thiết kế bởi Nhóm Dự Án FPT Polytechnic</p>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const toastLogin = document.getElementById('loginToast');
+        const toastLogout = document.getElementById('logoutToast');
+
+        // 🟢 Hiển thị toast đăng nhập
+        if (urlParams.get('loginSuccess')) {
+            toastLogin.classList.add('show');
+            setTimeout(() => toastLogin.classList.remove('show'), 4000);
+        }
+
+        // 🔴 Hiển thị toast đăng xuất
+        if (urlParams.get('logoutSuccess')) {
+            toastLogout.classList.add('show');
+            setTimeout(() => toastLogout.classList.remove('show'), 4000);
+        }
+    });
+</script>
+
+
+</body>
+</html>
+

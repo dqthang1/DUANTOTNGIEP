@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Hồ sơ cá nhân</title>
+    <style>
+        body { font-family: "Segoe UI", sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; }
+        .profile-container { display: flex; max-width: 1100px; margin: 40px auto; background: white; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+        .sidebar { width: 260px; background-color: #222; color: white; padding: 20px; text-align: center; }
+        .avatar-wrapper { position: relative; display: inline-block; margin-bottom: 10px; }
+        .avatar-wrapper img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #4CAF50;
+            cursor: pointer; transition: 0.3s; }
+        .avatar-wrapper img:hover { transform: scale(1.05); }
+        .avatar-wrapper input { display: none; }
+        .avatar-wrapper label { position: absolute; bottom: 0; right: 0; background: #4CAF50; color: white; padding: 5px 8px;
+            border-radius: 50%; cursor: pointer; font-size: 12px; }
+        .user-name { font-weight: bold; font-size: 18px; margin-bottom: 20px; }
+        .sidebar ul { list-style: none; padding: 0; text-align: left; }
+        .sidebar li { padding: 10px 0; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar li:hover, .sidebar li.active { color: #4CAF50; }
+
+        .content { flex: 1; padding: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; }
+        input, select { width: 90%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background-color: #4CAF50; border: none; border-radius: 6px; color: white; cursor: pointer; }
+        button:hover { background-color: #43a047; }
+        .alert-success { color: green; font-weight: bold; }
+        .alert-error { color: red; font-weight: bold; }
+        .two-columns { display: flex; flex-wrap: wrap; gap: 20px; }
+        .two-columns .form-group { flex: 1 1 calc(50% - 20px); }
+        #tab-password .form-group label { display: block; margin-bottom: 6px; }
+        #tab-password input { display: block; width: 60%; margin-bottom: 10px; }
+
+        /* small helpers */
+        .address-card { border:1px solid #ddd; border-radius:8px; padding:10px; margin-bottom:10px; }
+        .address-actions a { margin-right: 8px; color:#007bff; text-decoration:none; }
+        .address-actions a:hover { text-decoration:underline; }
+    </style>
+</head>
+<body>
+
+<div class="profile-container">
+    <div class="sidebar">
+        <div class="avatar-wrapper">
+            <!-- Nếu user.avatarUrl có (có thể là URL tuyệt đối hoặc đường dẫn /uploads/...), show nó -->
+            <img th:if="${user.avatarUrl != null and user.avatarUrl != ''}" th:src="${user.avatarUrl}"
+                 alt="Avatar" id="avatarPreview" onclick="viewAvatar(this)">
+            <!-- Nếu không có avatar -> show default (từ classpath:/static/images/default-avatar.png) -->
+            <img th:unless="${user.avatarUrl != null and user.avatarUrl != ''}" th:src="@{/images/default-avatar.png}"
+                 alt="Avatar" id="avatarPreviewDefault" onclick="viewAvatar(this)">
+
+            <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data" id="avatarForm" style="margin-top:10px;">
+                <input type="file" name="avatar" id="avatarInput" accept="image/*">
+                <label for="avatarInput">✎</label>
+            </form>
+        </div>
+
+        <div class="user-name" th:text="${user.ten}">Người dùng</div>
+
+        <ul id="menu">
+            <li class="active" data-tab="personal">Thông tin cá nhân</li>
+            <li data-tab="password">Mật khẩu tài khoản</li>
+            <li data-tab="address">Địa chỉ giao hàng</li>
+            <li data-tab="orders">Lịch sử đơn hàng</li>
+            <li data-tab="favorites">Sản phẩm yêu thích</li>
+            <li>
+                <form th:action="@{/auth/logout}" method="post" style="margin:0;">
+                    <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">Đăng xuất</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert-error" th:text="${errorMessage}"></div>
+
+        <!-- Tab Thông tin cá nhân -->
+        <div id="tab-personal" class="tab-content">
+            <h2>Thông tin cá nhân</h2>
+            <form th:action="@{/profile/update}" th:object="${user}" method="post" onsubmit="return validatePersonalForm()">
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>Họ và tên *</label>
+                        <input type="text" th:field="*{ten}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" th:field="*{email}" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số điện thoại *</label>
+                        <input type="text" th:field="*{soDienThoai}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Giới tính *</label>
+                        <select th:field="*{gioiTinh}" required>
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày sinh *</label>
+                        <input type="date" name="ngaySinh"
+                               th:value="${user.ngaySinh != null ? #temporals.format(user.ngaySinh, 'yyyy-MM-dd') : ''}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày tạo tài khoản</label>
+                        <input type="text" th:value="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thành phố *</label>
+                        <input type="text" th:field="*{thanhPho}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Địa chỉ *</label>
+                        <input type="text" th:field="*{diaChi}" required>
+                    </div>
+                </div>
+                <button type="submit">Cập nhật thông tin</button>
+            </form>
+        </div>
+
+        <!-- Tab Đổi mật khẩu -->
+        <div id="tab-password" class="tab-content" style="display:none;">
+            <h2>Mật khẩu tài khoản</h2>
+
+            <!-- 🟢 Nếu chưa có mật khẩu -->
+<!--            <div th:if="${showSetPasswordForm}">-->
+<!--                <p>Bạn đang đăng nhập bằng tài khoản Google và chưa có mật khẩu. Hãy đặt mật khẩu để đăng nhập bằng email sau này.</p>-->
+<!--                <form th:action="@{/profile/set-password}" method="post">-->
+<!--                    <div class="form-group">-->
+<!--                        <label>Mật khẩu mới</label>-->
+<!--                        <input type="password" name="newPassword" required>-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label>Xác nhận mật khẩu</label>-->
+<!--                        <input type="password" name="confirmPassword" required>-->
+<!--                    </div>-->
+<!--                    <button type="submit">Đặt mật khẩu</button>-->
+<!--                </form>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; 🔵 Nếu đã có mật khẩu &ndash;&gt;-->
+<!--            <div th:unless="${showSetPasswordForm}">-->
+                <form th:action="@{/profile/change-password}" method="post">
+                    <div class="form-group">
+                        <label>Mật khẩu cũ</label>
+                        <input type="password" name="oldPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu mới</label>
+                        <input type="password" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Xác nhận mật khẩu mới</label>
+                        <input type="password" name="confirmPassword" required>
+                    </div>
+                    <button type="submit">Đổi mật khẩu</button>
+                </form>
+<!--            </div>-->
+        </div>
+
+        <!-- Tab Địa chỉ giao hàng -->
+        <div id="tab-address" class="tab-content" style="display:none;">
+            <h2>Địa chỉ giao hàng</h2>
+
+            <div th:if="${addresses == null or #lists.isEmpty(addresses)}">
+                <p>Bạn chưa có địa chỉ giao hàng nào.</p>
+            </div>
+
+            <div th:if="${addresses != null}">
+                <div th:each="addr : ${addresses}">
+                    <div class="address-card">
+                        <p><strong th:text="${addr.hoTenNhan}">Họ tên</strong>
+                            (<span th:text="${addr.soDienThoai}">SĐT</span>)</p>
+                        <p th:text="|${addr.diaChi}, ${addr.quanHuyen}, ${addr.tinhThanh}|">Địa chỉ đầy đủ</p>
+                    </div>
+
+                    <div>
+                        <p class="address-actions">
+                            <span th:if="${addr.macDinh}" style="color:green; font-weight:600;">[Mặc định]</span>
+                            <a href="#" th:onclick="|editAddress(${addr.id}); return false;|">Chỉnh sửa</a>
+                            <a th:if="${!addr.macDinh}" th:href="@{'/profile/address/set-default/' + ${addr.id}}">Đặt làm mặc định</a>
+                            <a th:href="@{'/profile/address/delete/' + ${addr.id}}"
+                               onclick="return confirm('Xóa địa chỉ này?')">Xóa</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <h3>Thêm / Cập nhật địa chỉ</h3>
+
+            <form th:action="@{/profile/address/save}" th:object="${newAddress}" method="post" id="addressForm">
+                <input type="hidden" th:field="*{id}" id="address-id">
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>Họ tên người nhận *</label>
+                        <input type="text" th:field="*{hoTenNhan}" id="address-hoTenNhan" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại *</label>
+                        <input type="text" th:field="*{soDienThoai}" id="address-soDienThoai" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tỉnh / Thành phố *</label>
+                        <input type="text" th:field="*{tinhThanh}" id="address-tinhThanh" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quận / Huyện *</label>
+                        <input type="text" th:field="*{quanHuyen}" id="address-quanHuyen" required>
+                    </div>
+                    <div class="form-group" style="flex-basis:100%;">
+                        <label>Địa chỉ cụ thể *</label>
+                        <input type="text" th:field="*{diaChi}" id="address-diaChi" required>
+                    </div>
+                </div>
+                <button type="submit" id="saveAddressBtn">Lưu địa chỉ</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Chuyển tab - nếu có param ?tab=address thì hiển thị ngay tab đó
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const defaultTab = 'personal';
+        const tabs = document.querySelectorAll('#menu li[data-tab]');
+        const contents = document.querySelectorAll('.tab-content');
+
+        function showTab(name) {
+            tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+            contents.forEach(c => c.style.display = (c.id === 'tab-' + name) ? 'block' : 'none');
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => showTab(tab.dataset.tab));
+        });
+
+        showTab(defaultTab);
+
+        // Avatar handlers - chỉ thêm event nếu phần tử tồn tại
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarPreview = document.getElementById('avatarPreview') || document.getElementById('avatarPreviewDefault');
+        const avatarForm = document.getElementById('avatarForm');
+
+        if (avatarInput) {
+            avatarInput.addEventListener('change', () => {
+                const file = avatarInput.files[0];
+                if (file && avatarPreview) {
+                    const reader = new FileReader();
+                    reader.onload = e => avatarPreview.src = e.target.result;
+                    reader.readAsDataURL(file);
+                    if (avatarForm) avatarForm.submit();
+                }
+            });
+        }
+
+        window.viewAvatar = function(img) {
+            if (!img) return;
+            window.open(img.src, '_blank');
+        }
+
+    })();
+
+    function validatePersonalForm() {
+        const requiredFields = document.querySelectorAll('#tab-personal [required]');
+        for (const field of requiredFields) {
+            if (!field.value || !field.value.trim()) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                field.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 🟢 Chức năng chỉnh sửa địa chỉ
+    function editAddress(id) {
+        fetch(`/profile/address/get/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    document.getElementById('address-id').value = data.id || '';
+                    document.getElementById('address-hoTenNhan').value = data.hoTenNhan || '';
+                    document.getElementById('address-soDienThoai').value = data.soDienThoai || '';
+                    document.getElementById('address-tinhThanh').value = data.tinhThanh || '';
+                    document.getElementById('address-quanHuyen').value = data.quanHuyen || '';
+                    document.getElementById('address-diaChi').value = data.diaChi || '';
+
+                    document.getElementById('saveAddressBtn').textContent = 'Cập nhật địa chỉ';
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }
+            })
+            .catch(err => console.error('Lỗi khi lấy dữ liệu địa chỉ:', err));
+    }
+
+    // 🔄 Khi reload (F5) -> luôn trở lại tab "Thông tin cá nhân"
+    window.addEventListener("beforeunload", function () {
+        sessionStorage.setItem("reloaded", "true");
+    });
+
+    window.addEventListener("load", function () {
+        const wasReloaded = sessionStorage.getItem("reloaded");
+        if (wasReloaded) {
+            sessionStorage.removeItem("reloaded");
+            const tabs = document.querySelectorAll('#menu li[data-tab]');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === 'personal'));
+            contents.forEach(c => c.style.display = (c.id === 'tab-personal') ? 'block' : 'none');
+        }
+    });
+
+</script>
+
+</body>
+</html>
