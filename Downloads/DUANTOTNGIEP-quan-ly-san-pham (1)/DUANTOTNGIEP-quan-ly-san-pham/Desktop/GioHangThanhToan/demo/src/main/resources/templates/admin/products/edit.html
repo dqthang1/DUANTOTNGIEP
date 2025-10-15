@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa sản phẩm - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+        .btn-save { 
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        .btn-save:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-1px);
+        }
+        .form-control:focus { border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+        .debug-info { background: #e3f2fd; border-left: 4px solid #2196f3; }
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 2px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        .main-content {
+            padding: 20px;
+        }
+        
+        /* Color badge selection styles */
+        .color-badge.selected {
+            border: 3px solid #007bff !important;
+            transform: scale(1.1);
+            transition: all 0.3s ease;
+        }
+        
+        .size-badge:hover,
+        .color-badge:hover {
+            cursor: pointer;
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-white-50">Quản lý sản phẩm</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/products">
+                                <i class="fas fa-box me-2"></i>
+                                Quản lý sản phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/sports">
+                                <i class="fas fa-futbol me-2"></i>
+                                Môn thể thao
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/banners">
+                                <i class="fas fa-image me-2"></i>
+                                Banner
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="fas fa-home me-2"></i>
+                                Về trang chủ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+        <div class="row">
+            <div class="col-12">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>
+                        Chỉnh sửa sản phẩm
+                    </h2>
+                    <a href="/admin/products" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Quay lại
+                    </a>
+                </div>
+
+                <!-- Debug Info -->
+                <div class="alert alert-info debug-info mb-4">
+                    <h6><i class="fas fa-bug me-1"></i> Debug Information:</h6>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>ID:</strong> <span th:text="${product?.id}">N/A</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Tên:</strong> <span th:text="${product?.ten}">N/A</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Giá:</strong> <span th:text="${product?.gia}">N/A</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Danh mục:</strong> <span th:text="${product?.danhMuc?.ten}">N/A</span>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-3">
+                            <strong>Thương hiệu:</strong> <span th:text="${product?.thuongHieu?.ten}">N/A</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Môn thể thao:</strong> <span th:text="${product?.monTheThao?.ten}">N/A</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Categories:</strong> <span th:text="${categories?.size()}">N/A</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Brands:</strong> <span th:text="${brands?.size()}">N/A</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="@{/admin/products/{id}/edit(id=${product.id})}" method="post" enctype="multipart/form-data" th:object="${product}">
+                            
+                            <!-- Thông tin cơ bản -->
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Thông tin cơ bản
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="ten" class="form-label">Tên sản phẩm *</label>
+                                        <input type="text" class="form-control" id="ten" th:field="*{ten}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="maSanPham" class="form-label">Mã sản phẩm</label>
+                                        <input type="text" class="form-control" id="maSanPham" th:field="*{maSanPham}" readonly>
+                                        <div class="form-text">Mã sản phẩm không thể thay đổi</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="moTa" class="form-label">Mô tả</label>
+                                    <textarea class="form-control" id="moTa" th:field="*{moTa}" rows="4"></textarea>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="gia" class="form-label">Giá bán *</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="gia" th:field="*{gia}" min="0" step="1000" required>
+                                            <span class="input-group-text">VNĐ</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="giaGoc" class="form-label">Giá gốc</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="giaGoc" th:field="*{giaGoc}" min="0" step="1000">
+                                            <span class="input-group-text">VNĐ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="soLuongTon" class="form-label">Số lượng tồn kho</label>
+                                        <input type="number" class="form-control" id="soLuongTon" th:field="*{soLuongTon}" min="0">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="chatLieu" class="form-label">Chất liệu</label>
+                                        <input type="text" class="form-control" id="chatLieu" th:field="*{chatLieu}">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="xuatXu" class="form-label">Xuất xứ</label>
+                                        <input type="text" class="form-control" id="xuatXu" th:field="*{xuatXu}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check mt-4">
+                                            <input class="form-check-input" type="checkbox" id="noiBat" th:field="*{noiBat}">
+                                            <label class="form-check-label" for="noiBat">
+                                                Sản phẩm nổi bật
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phân loại -->
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-tags me-2"></i>
+                                    Phân loại
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="danhMuc" class="form-label">Danh mục</label>
+                                        <select class="form-select" id="danhMuc" th:field="*{danhMuc.id}">
+                                            <option value="">Chọn danh mục</option>
+                                            <option th:each="category : ${categories}" 
+                                                    th:value="${category.id}" 
+                                                    th:text="${category.ten}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="thuongHieu" class="form-label">Thương hiệu</label>
+                                        <select class="form-select" id="thuongHieu" th:field="*{thuongHieu.id}">
+                                            <option value="">Chọn thương hiệu</option>
+                                            <option th:each="brand : ${brands}" 
+                                                    th:value="${brand.id}" 
+                                                    th:text="${brand.ten}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="monTheThao" class="form-label">Môn thể thao</label>
+                                        <select class="form-select" id="monTheThao" th:field="*{monTheThao.id}">
+                                            <option value="">Chọn môn thể thao</option>
+                                            <option th:each="sport : ${sports}" 
+                                                    th:value="${sport.id}" 
+                                                    th:text="${sport.ten}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Biến thể sản phẩm -->
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-palette me-2"></i>
+                                    Biến thể sản phẩm (Màu sắc & Kích thước)
+                                </h5>
+                                
+                                <!-- Current Variants Display -->
+                                <div class="mb-4">
+                                    <h6>Biến thể hiện tại:</h6>
+                                    <div id="current-variants" class="row">
+                                        <div th:each="variant : ${variants}" class="col-md-6 mb-3">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-8">
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">SKU:</small> 
+                                                                <strong th:text="${variant.maSku}">N/A</strong>
+                                                            </div>
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">Kích thước:</small>
+                                                                <span class="badge bg-primary ms-1" th:text="${variant.kichCo}">N/A</span>
+                                                            </div>
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">Màu sắc:</small>
+                                                                <span class="badge bg-secondary ms-1" th:text="${variant.mauSac}">N/A</span>
+                                                            </div>
+                                                            <div class="mb-2">
+                                                                <small class="text-muted">Tồn kho:</small>
+                                                                <span class="fw-bold text-success ms-1" th:text="${variant.soLuongTon}">N/A</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="btn-group-vertical w-100" role="group">
+                                                                <button type="button" class="btn btn-outline-primary btn-sm mb-1" 
+                                                                        th:onclick="'editVariant(' + ${variant.id} + ', \'' + ${variant.kichCo} + '\', \'' + ${variant.mauSac} + '\', ' + ${variant.soLuongTon} + ')'">
+                                                                    <i class="fas fa-edit me-1"></i>Sửa
+                                                                </button>
+                                                                <button type="button" class="btn btn-outline-warning btn-sm mb-1"
+                                                                        th:data-current-size="${variant.kichCo}"
+                                                                        th:data-current-color="${variant.mauSac}"
+                                                                        th:onclick="'editVariantSizeColor(' + ${variant.id} + ', \'' + ${variant.kichCo} + '\', \'' + ${variant.mauSac} + '\')'">
+                                                                    <i class="fas fa-palette me-1"></i>Sửa Màu/Kích cỡ
+                                                                </button>
+                                                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                                        th:onclick="'deleteVariant(' + ${variant.id} + ')'">
+                                                                    <i class="fas fa-trash me-1"></i>Xóa
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div th:if="${variants == null or variants.isEmpty()}" class="col-12">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Chưa có biến thể nào. Thêm biến thể bên dưới.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Add New Variants -->
+                                <div class="border rounded p-3 bg-light">
+                                    <h6>Thêm biến thể mới:</h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Kích thước</label>
+                                            <div id="sizes-container">
+                                                <div class="input-group mb-2">
+                                                    <input type="text" class="form-control size-input" placeholder="Nhập kích thước (VD: S, M, L)">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="removeSizeInput(this)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSizeInput()">
+                                                <i class="fas fa-plus me-1"></i>Thêm kích thước
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Màu sắc</label>
+                                            <div id="colors-container">
+                                                <div class="input-group mb-2">
+                                                    <input type="text" class="form-control color-input" placeholder="Nhập màu sắc (VD: Đỏ, Xanh)">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="removeColorInput(this)">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addColorInput()">
+                                                <i class="fas fa-plus me-1"></i>Thêm màu sắc
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success" onclick="generateVariants()">
+                                        <i class="fas fa-magic me-1"></i>Tạo biến thể
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Chỉnh sửa màu sắc và kích cỡ -->
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Chỉnh sửa màu sắc & kích cỡ
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Danh sách kích cỡ có sẵn</label>
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="d-flex flex-wrap gap-2" id="size-list">
+                                                <span class="badge bg-secondary size-badge" data-size="XS">XS</span>
+                                                <span class="badge bg-secondary size-badge" data-size="S">S</span>
+                                                <span class="badge bg-secondary size-badge" data-size="M">M</span>
+                                                <span class="badge bg-secondary size-badge" data-size="L">L</span>
+                                                <span class="badge bg-secondary size-badge" data-size="XL">XL</span>
+                                                <span class="badge bg-secondary size-badge" data-size="XXL">XXL</span>
+                                            </div>
+                                            <small class="text-muted">Click để chọn kích cỡ</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Danh sách màu sắc có sẵn</label>
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="d-flex flex-wrap gap-2" id="color-list">
+                                                <span class="badge bg-danger color-badge" data-color="Đỏ">Đỏ</span>
+                                                <span class="badge bg-primary color-badge" data-color="Xanh">Xanh</span>
+                                                <span class="badge bg-success color-badge" data-color="Xanh lá">Xanh lá</span>
+                                                <span class="badge bg-warning color-badge" data-color="Vàng">Vàng</span>
+                                                <span class="badge bg-dark color-badge" data-color="Đen">Đen</span>
+                                                <span class="badge bg-secondary color-badge" data-color="Trắng">Trắng</span>
+                                                <span class="badge bg-info color-badge" data-color="Xám">Xám</span>
+                                                <span class="badge" style="background-color: #ff69b4;" data-color="Hồng">Hồng</span>
+                                            </div>
+                                            <small class="text-muted">Click để chọn màu sắc</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Kích cỡ đã chọn</label>
+                                        <div class="border rounded p-3 bg-light" id="selected-sizes">
+                                            <span class="text-muted">Chưa chọn kích cỡ nào</span>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="clearSelectedSizes()">
+                                            <i class="fas fa-trash me-1"></i>Xóa tất cả
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Màu sắc đã chọn</label>
+                                        <div class="border rounded p-3 bg-light" id="selected-colors">
+                                            <span class="text-muted">Chưa chọn màu sắc nào</span>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="clearSelectedColors()">
+                                            <i class="fas fa-trash me-1"></i>Xóa tất cả
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-primary" onclick="generateVariantsFromSelection()">
+                                        <i class="fas fa-magic me-1"></i>Tạo biến thể từ lựa chọn
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Hình ảnh -->
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-images me-2"></i>
+                                    Hình ảnh sản phẩm
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="anhChinh" class="form-label">Ảnh chính</label>
+                                        <input type="url" class="form-control" id="anhChinh" th:field="*{anhChinh}" 
+                                               placeholder="URL hình ảnh">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="newImages" class="form-label">Ảnh bổ sung</label>
+                                        <input type="file" class="form-control" id="newImages" name="newImages" multiple accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Buttons - QUAN TRỌNG -->
+                            <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                                <a href="/admin/products" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Hủy
+                                </a>
+                                <button type="submit" class="btn btn-save">
+                                    <i class="fas fa-save me-1"></i>
+                                    Cập nhật sản phẩm
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa biến thể -->
+    <div class="modal fade" id="editVariantModal" tabindex="-1" aria-labelledby="editVariantModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editVariantModalLabel">Chỉnh sửa biến thể</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editVariantForm">
+                        <input type="hidden" id="editVariantId" name="variantId">
+                        <div class="mb-3">
+                            <label for="editVariantSize" class="form-label">Kích thước</label>
+                            <input type="text" class="form-control" id="editVariantSize" name="size" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editVariantColor" class="form-label">Màu sắc</label>
+                            <input type="text" class="form-control" id="editVariantColor" name="color" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editVariantStock" class="form-label">Số lượng tồn kho</label>
+                            <input type="number" class="form-control" id="editVariantStock" name="stock" min="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveVariantChanges()">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa màu sắc và kích cỡ -->
+    <div class="modal fade" id="editSizeColorModal" tabindex="-1" aria-labelledby="editSizeColorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSizeColorModalLabel">Chỉnh sửa màu sắc và kích cỡ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editSizeColorVariantId">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <h6>Chọn kích cỡ mới:</h6>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="d-flex flex-wrap gap-2" id="modal-size-list">
+                                    <span class="badge bg-secondary modal-size-badge" data-size="XS">XS</span>
+                                    <span class="badge bg-secondary modal-size-badge" data-size="S">S</span>
+                                    <span class="badge bg-secondary modal-size-badge" data-size="M">M</span>
+                                    <span class="badge bg-secondary modal-size-badge" data-size="L">L</span>
+                                    <span class="badge bg-secondary modal-size-badge" data-size="XL">XL</span>
+                                    <span class="badge bg-secondary modal-size-badge" data-size="XXL">XXL</span>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label">Hoặc nhập kích cỡ tùy chỉnh:</label>
+                                    <input type="text" class="form-control" id="customSizeInput" placeholder="VD: 28, 30, 32">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <h6>Chọn màu sắc mới:</h6>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="d-flex flex-wrap gap-2" id="modal-color-list">
+                                    <span class="badge bg-danger modal-color-badge" data-color="Đỏ">Đỏ</span>
+                                    <span class="badge bg-primary modal-color-badge" data-color="Xanh">Xanh</span>
+                                    <span class="badge bg-success modal-color-badge" data-color="Xanh lá">Xanh lá</span>
+                                    <span class="badge bg-warning modal-color-badge" data-color="Vàng">Vàng</span>
+                                    <span class="badge bg-dark modal-color-badge" data-color="Đen">Đen</span>
+                                    <span class="badge bg-secondary modal-color-badge" data-color="Trắng">Trắng</span>
+                                    <span class="badge bg-info modal-color-badge" data-color="Xám">Xám</span>
+                                    <span class="badge" style="background-color: #ff69b4;" data-color="Hồng">Hồng</span>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label">Hoặc nhập màu tùy chỉnh:</label>
+                                    <input type="text" class="form-control" id="customColorInput" placeholder="VD: Xanh navy, Cam">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Kích cỡ đã chọn:</h6>
+                            <div class="border rounded p-3 bg-light" id="modal-selected-size">
+                                <span class="text-muted">Chưa chọn kích cỡ</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Màu sắc đã chọn:</h6>
+                            <div class="border rounded p-3 bg-light" id="modal-selected-color">
+                                <span class="text-muted">Chưa chọn màu sắc</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3" id="duplicate-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Cảnh báo:</strong> Biến thể với kích cỡ và màu sắc này đã tồn tại!
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSizeColorChanges()" id="saveSizeColorBtn" disabled>Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log('=== EDIT PAGE LOADED ===');
+        console.log('Product ID:', document.getElementById('ten').value);
+        console.log('Product Name:', document.getElementById('ten').value);
+        console.log('Product Price:', document.getElementById('gia').value);
+        
+        // Kiểm tra button có tồn tại không
+        const saveButton = document.querySelector('button[type="submit"]');
+        if (saveButton) {
+            console.log('✅ Save button found:', saveButton);
+            saveButton.style.display = 'block';
+            saveButton.style.visibility = 'visible';
+        } else {
+            console.error('❌ Save button NOT found!');
+        }
+        
+        // Kiểm tra form có tồn tại không
+        const form = document.querySelector('form');
+        if (form) {
+            console.log('✅ Form found:', form);
+        } else {
+            console.error('❌ Form NOT found!');
+        }
+        
+        // Test form submission
+        form.addEventListener('submit', function(e) {
+            console.log('Form submitted!');
+            console.log('Product name:', document.getElementById('ten').value);
+            console.log('Product price:', document.getElementById('gia').value);
+        });
+        
+        // ========== COLOR & SIZE SELECTION FUNCTIONS ==========
+        
+        let selectedSizes = [];
+        let selectedColors = [];
+        
+        // Initialize color and size selection
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to size badges
+            document.querySelectorAll('.size-badge').forEach(badge => {
+                badge.addEventListener('click', function() {
+                    toggleSizeSelection(this);
+                });
+            });
+            
+            // Add click handlers to color badges
+            document.querySelectorAll('.color-badge').forEach(badge => {
+                badge.addEventListener('click', function() {
+                    toggleColorSelection(this);
+                });
+            });
+        });
+        
+        // Toggle size selection
+        function toggleSizeSelection(badge) {
+            const size = badge.getAttribute('data-size');
+            
+            if (badge.classList.contains('bg-primary')) {
+                // Deselect
+                badge.classList.remove('bg-primary');
+                badge.classList.add('bg-secondary');
+                selectedSizes = selectedSizes.filter(s => s !== size);
+            } else {
+                // Select
+                badge.classList.remove('bg-secondary');
+                badge.classList.add('bg-primary');
+                selectedSizes.push(size);
+            }
+            
+            updateSelectedSizesDisplay();
+        }
+        
+        // Toggle color selection
+        function toggleColorSelection(badge) {
+            const color = badge.getAttribute('data-color');
+            
+            if (badge.classList.contains('selected')) {
+                // Deselect
+                badge.classList.remove('selected');
+                badge.style.border = 'none';
+                selectedColors = selectedColors.filter(c => c !== color);
+            } else {
+                // Select
+                badge.classList.add('selected');
+                badge.style.border = '3px solid #007bff';
+                selectedColors.push(color);
+            }
+            
+            updateSelectedColorsDisplay();
+        }
+        
+        // Update selected sizes display
+        function updateSelectedSizesDisplay() {
+            const container = document.getElementById('selected-sizes');
+            
+            if (selectedSizes.length === 0) {
+                container.innerHTML = '<span class="text-muted">Chưa chọn kích cỡ nào</span>';
+            } else {
+                container.innerHTML = selectedSizes.map(size => 
+                    `<span class="badge bg-primary me-1">${size}</span>`
+                ).join('');
+            }
+        }
+        
+        // Update selected colors display
+        function updateSelectedColorsDisplay() {
+            const container = document.getElementById('selected-colors');
+            
+            if (selectedColors.length === 0) {
+                container.innerHTML = '<span class="text-muted">Chưa chọn màu sắc nào</span>';
+            } else {
+                container.innerHTML = selectedColors.map(color => 
+                    `<span class="badge bg-secondary me-1">${color}</span>`
+                ).join('');
+            }
+        }
+        
+        // Clear selected sizes
+        function clearSelectedSizes() {
+            selectedSizes = [];
+            document.querySelectorAll('.size-badge').forEach(badge => {
+                badge.classList.remove('bg-primary');
+                badge.classList.add('bg-secondary');
+            });
+            updateSelectedSizesDisplay();
+        }
+        
+        // Clear selected colors
+        function clearSelectedColors() {
+            selectedColors = [];
+            document.querySelectorAll('.color-badge').forEach(badge => {
+                badge.classList.remove('selected');
+                badge.style.border = 'none';
+            });
+            updateSelectedColorsDisplay();
+        }
+        
+        // Generate variants from selection
+        function generateVariantsFromSelection() {
+            if (selectedSizes.length === 0 || selectedColors.length === 0) {
+                alert('Vui lòng chọn ít nhất một kích cỡ và một màu sắc!');
+                return;
+            }
+            
+            // Clear existing inputs
+            document.querySelectorAll('.size-input').forEach(input => {
+                if (input.parentElement.parentElement.children.length > 1) {
+                    input.parentElement.remove();
+                }
+            });
+            document.querySelectorAll('.color-input').forEach(input => {
+                if (input.parentElement.parentElement.children.length > 1) {
+                    input.parentElement.remove();
+                }
+            });
+            
+            // Set values to inputs
+            const firstSizeInput = document.querySelector('.size-input');
+            const firstColorInput = document.querySelector('.color-input');
+            
+            if (firstSizeInput) firstSizeInput.value = selectedSizes.join(', ');
+            if (firstColorInput) firstColorInput.value = selectedColors.join(', ');
+            
+            // Generate variants
+            generateVariants();
+            
+            // Clear selections
+            clearSelectedSizes();
+            clearSelectedColors();
+        }
+        
+        // ========== VARIANT MANAGEMENT FUNCTIONS ==========
+        
+        // Thêm input kích thước
+        function addSizeInput() {
+            const container = document.getElementById('sizes-container');
+            const newInput = document.createElement('div');
+            newInput.className = 'input-group mb-2';
+            newInput.innerHTML = `
+                <input type="text" class="form-control size-input" placeholder="Nhập kích thước (VD: S, M, L)">
+                <button type="button" class="btn btn-outline-secondary" onclick="removeSizeInput(this)">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
+            container.appendChild(newInput);
+        }
+        
+        // Xóa input kích thước
+        function removeSizeInput(button) {
+            const container = document.getElementById('sizes-container');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+        
+        // Thêm input màu sắc
+        function addColorInput() {
+            const container = document.getElementById('colors-container');
+            const newInput = document.createElement('div');
+            newInput.className = 'input-group mb-2';
+            newInput.innerHTML = `
+                <input type="text" class="form-control color-input" placeholder="Nhập màu sắc (VD: Đỏ, Xanh)">
+                <button type="button" class="btn btn-outline-secondary" onclick="removeColorInput(this)">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
+            container.appendChild(newInput);
+        }
+        
+        // Xóa input màu sắc
+        function removeColorInput(button) {
+            const container = document.getElementById('colors-container');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+        
+        // Tạo biến thể từ kích thước và màu sắc
+        function generateVariants() {
+            // Lấy tất cả giá trị từ các input, xử lý dấu phẩy
+            const allSizes = Array.from(document.querySelectorAll('.size-input'))
+                .map(input => input.value.trim())
+                .filter(value => value !== '')
+                .flatMap(value => value.split(',').map(s => s.trim()).filter(s => s !== ''));
+            
+            const allColors = Array.from(document.querySelectorAll('.color-input'))
+                .map(input => input.value.trim())
+                .filter(value => value !== '')
+                .flatMap(value => value.split(',').map(c => c.trim()).filter(c => c !== ''));
+            
+            if (allSizes.length === 0 || allColors.length === 0) {
+                alert('Vui lòng nhập ít nhất một kích thước và một màu sắc!');
+                return;
+            }
+            
+            // Kiểm tra trùng lặp
+            const duplicates = findDuplicateVariants(allSizes, allColors);
+            if (duplicates.length > 0) {
+                let duplicateMessage = 'Các biến thể sau đã tồn tại:\n';
+                duplicates.forEach(dup => {
+                    duplicateMessage += `- ${dup.size} / ${dup.color}\n`;
+                });
+                duplicateMessage += '\nBạn có muốn tạo các biến thể khác không?';
+                
+                if (!confirm(duplicateMessage)) {
+                    return;
+                }
+            }
+            
+            // Hiển thị preview modal
+            showVariantPreview(allSizes, allColors, duplicates);
+        }
+        
+        // Tìm biến thể trùng lặp
+        function findDuplicateVariants(sizes, colors) {
+            const currentVariants = [];
+            const existingVariants = document.querySelectorAll('#current-variants .card');
+            
+            existingVariants.forEach(card => {
+                // Tìm các span chứa kích thước và màu sắc
+                const sizeBadge = card.querySelector('.badge.bg-primary');
+                const colorBadge = card.querySelector('.badge.bg-secondary');
+                
+                if (sizeBadge && colorBadge) {
+                    currentVariants.push({
+                        size: sizeBadge.textContent.trim(),
+                        color: colorBadge.textContent.trim()
+                    });
+                }
+            });
+            
+            const duplicates = [];
+            sizes.forEach(size => {
+                colors.forEach(color => {
+                    if (currentVariants.some(v => v.size === size && v.color === color)) {
+                        duplicates.push({size, color});
+                    }
+                });
+            });
+            
+            return duplicates;
+        }
+        
+        // Hiển thị modal preview biến thể
+        function showVariantPreview(sizes, colors, duplicates) {
+            const modalHtml = `
+                <div class="modal fade" id="variantPreviewModal" tabindex="-1" aria-labelledby="variantPreviewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="variantPreviewModalLabel">Xem trước biến thể</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Biến thể mới sẽ tạo:</h6>
+                                        <div id="new-variants-list" class="mb-3"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Biến thể đã tồn tại:</h6>
+                                        <div id="duplicate-variants-list" class="mb-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="button" class="btn btn-success" onclick="confirmCreateVariants()">Tạo biến thể mới</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Xóa modal cũ nếu có
+            const existingModal = document.getElementById('variantPreviewModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Thêm modal mới
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Hiển thị danh sách biến thể mới
+            const newVariantsList = document.getElementById('new-variants-list');
+            const duplicateVariantsList = document.getElementById('duplicate-variants-list');
+            
+            let newVariantsHtml = '';
+            let duplicateVariantsHtml = '';
+            
+            sizes.forEach(size => {
+                colors.forEach(color => {
+                    const isDuplicate = duplicates.some(d => d.size === size && d.color === color);
+                    const variantHtml = `
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="${size}|${color}" 
+                                   ${isDuplicate ? 'disabled' : 'checked'} id="variant-${size}-${color}">
+                            <label class="form-check-label ${isDuplicate ? 'text-muted' : ''}" for="variant-${size}-${color}">
+                                ${size} / ${color}
+                            </label>
+                        </div>
+                    `;
+                    
+                    if (isDuplicate) {
+                        duplicateVariantsHtml += variantHtml;
+                    } else {
+                        newVariantsHtml += variantHtml;
+                    }
+                });
+            });
+            
+            newVariantsList.innerHTML = newVariantsHtml || '<p class="text-muted">Không có biến thể mới</p>';
+            duplicateVariantsList.innerHTML = duplicateVariantsHtml || '<p class="text-muted">Không có biến thể trùng lặp</p>';
+            
+            // Hiển thị modal
+            const modal = new bootstrap.Modal(document.getElementById('variantPreviewModal'));
+            modal.show();
+        }
+        
+        // Xác nhận tạo biến thể
+        function confirmCreateVariants() {
+            const selectedVariants = Array.from(document.querySelectorAll('#new-variants-list input[type="checkbox"]:checked'))
+                .map(checkbox => {
+                    const [size, color] = checkbox.value.split('|');
+                    return {size, color};
+                });
+            
+            if (selectedVariants.length === 0) {
+                alert('Vui lòng chọn ít nhất một biến thể để tạo!');
+                return;
+            }
+            
+            const sizes = [...new Set(selectedVariants.map(v => v.size))];
+            const colors = [...new Set(selectedVariants.map(v => v.color))];
+            
+            // Đóng modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('variantPreviewModal'));
+            modal.hide();
+            
+            // Tạo biến thể
+            createVariants(sizes, colors);
+        }
+        
+        // Gửi request tạo biến thể
+        async function createVariants(sizes, colors) {
+            try {
+                const productId = window.location.pathname.split('/')[3]; // Lấy ID từ URL
+                
+                const response = await fetch(`/admin/products/${productId}/variants`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sizes: sizes,
+                        colors: colors
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Hiển thị thông báo chi tiết
+                    let message = result.message;
+                    if (result.createdVariants && result.createdVariants.length > 0) {
+                        message += '\n\nBiến thể đã tạo:';
+                        result.createdVariants.forEach(variant => {
+                            message += `\n- ${variant.size} / ${variant.color} (SKU: ${variant.sku})`;
+                        });
+                    }
+                    if (result.duplicateVariants && result.duplicateVariants.length > 0) {
+                        message += '\n\nBiến thể đã tồn tại:';
+                        result.duplicateVariants.forEach(variant => {
+                            message += `\n- ${variant.size} / ${variant.color}`;
+                        });
+                    }
+                    
+                    alert(message);
+                    location.reload(); // Reload trang để hiển thị biến thể mới
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error creating variants:', error);
+                alert('Có lỗi xảy ra khi tạo biến thể!');
+            }
+        }
+        
+        // Xóa biến thể
+        async function deleteVariant(variantId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa biến thể này?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/products/variants/${variantId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Xóa biến thể thành công!');
+                    location.reload(); // Reload trang để cập nhật danh sách
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting variant:', error);
+                alert('Có lỗi xảy ra khi xóa biến thể!');
+            }
+        }
+        
+        // Chỉnh sửa biến thể
+        function editVariant(variantId, size, color, stock) {
+            document.getElementById('editVariantId').value = variantId;
+            document.getElementById('editVariantSize').value = size;
+            document.getElementById('editVariantColor').value = color;
+            document.getElementById('editVariantStock').value = stock;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editVariantModal'));
+            modal.show();
+        }
+        
+        // Lưu thay đổi biến thể
+        async function saveVariantChanges() {
+            const variantId = document.getElementById('editVariantId').value;
+            const size = document.getElementById('editVariantSize').value.trim();
+            const color = document.getElementById('editVariantColor').value.trim();
+            const stock = parseInt(document.getElementById('editVariantStock').value) || 0;
+            
+            if (!size || !color) {
+                alert('Vui lòng nhập đầy đủ kích thước và màu sắc!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/products/variants/${variantId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        size: size,
+                        color: color,
+                        stock: stock
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Cập nhật biến thể thành công!');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editVariantModal'));
+                    modal.hide();
+                    location.reload(); // Reload trang để cập nhật danh sách
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating variant:', error);
+                alert('Có lỗi xảy ra khi cập nhật biến thể!');
+            }
+        }
+        
+        // ========== SIZE & COLOR EDITING FUNCTIONS ==========
+        
+        let modalSelectedSize = '';
+        let modalSelectedColor = '';
+        let allVariants = [];
+        
+        // Initialize modal data
+        function initializeModalData() {
+            // Get all current variants for duplicate checking
+            allVariants = [];
+            document.querySelectorAll('#current-variants .card').forEach(card => {
+                const sizeBadge = card.querySelector('.badge.bg-primary');
+                const colorBadge = card.querySelector('.badge.bg-secondary');
+                
+                if (sizeBadge && colorBadge) {
+                    allVariants.push({
+                        size: sizeBadge.textContent.trim(),
+                        color: colorBadge.textContent.trim()
+                    });
+                }
+            });
+        }
+        
+        // Edit variant size and color
+        function editVariantSizeColor(variantId, currentSize, currentColor) {
+            initializeModalData();
+            
+            document.getElementById('editSizeColorVariantId').value = variantId;
+            modalSelectedSize = currentSize;
+            modalSelectedColor = currentColor;
+            
+            // Reset modal state
+            resetModalSelections();
+            
+            // Show current selection
+            updateModalSelectedDisplay();
+            
+            // Add event listeners
+            addModalEventListeners();
+            
+            const modal = new bootstrap.Modal(document.getElementById('editSizeColorModal'));
+            modal.show();
+        }
+        
+        // Reset modal selections
+        function resetModalSelections() {
+            // Reset size badges
+            document.querySelectorAll('.modal-size-badge').forEach(badge => {
+                badge.classList.remove('bg-primary');
+                badge.classList.add('bg-secondary');
+            });
+            
+            // Reset color badges
+            document.querySelectorAll('.modal-color-badge').forEach(badge => {
+                badge.classList.remove('selected');
+                badge.style.border = 'none';
+            });
+            
+            // Clear custom inputs
+            document.getElementById('customSizeInput').value = '';
+            document.getElementById('customColorInput').value = '';
+            
+            // Hide warning
+            document.getElementById('duplicate-warning').style.display = 'none';
+            
+            // Disable save button
+            document.getElementById('saveSizeColorBtn').disabled = true;
+        }
+        
+        // Add event listeners to modal
+        function addModalEventListeners() {
+            // Size badge clicks
+            document.querySelectorAll('.modal-size-badge').forEach(badge => {
+                badge.addEventListener('click', function() {
+                    modalSelectedSize = this.getAttribute('data-size');
+                    resetModalSizeSelection();
+                    this.classList.remove('bg-secondary');
+                    this.classList.add('bg-primary');
+                    updateModalSelectedDisplay();
+                    checkForDuplicates();
+                });
+            });
+            
+            // Color badge clicks
+            document.querySelectorAll('.modal-color-badge').forEach(badge => {
+                badge.addEventListener('click', function() {
+                    modalSelectedColor = this.getAttribute('data-color');
+                    resetModalColorSelection();
+                    this.classList.add('selected');
+                    this.style.border = '3px solid #007bff';
+                    updateModalSelectedDisplay();
+                    checkForDuplicates();
+                });
+            });
+            
+            // Custom size input
+            document.getElementById('customSizeInput').addEventListener('input', function() {
+                if (this.value.trim()) {
+                    modalSelectedSize = this.value.trim();
+                    resetModalSizeSelection();
+                    updateModalSelectedDisplay();
+                    checkForDuplicates();
+                }
+            });
+            
+            // Custom color input
+            document.getElementById('customColorInput').addEventListener('input', function() {
+                if (this.value.trim()) {
+                    modalSelectedColor = this.value.trim();
+                    resetModalColorSelection();
+                    updateModalSelectedDisplay();
+                    checkForDuplicates();
+                }
+            });
+        }
+        
+        // Reset modal size selection
+        function resetModalSizeSelection() {
+            document.querySelectorAll('.modal-size-badge').forEach(badge => {
+                badge.classList.remove('bg-primary');
+                badge.classList.add('bg-secondary');
+            });
+            document.getElementById('customSizeInput').value = '';
+        }
+        
+        // Reset modal color selection
+        function resetModalColorSelection() {
+            document.querySelectorAll('.modal-color-badge').forEach(badge => {
+                badge.classList.remove('selected');
+                badge.style.border = 'none';
+            });
+            document.getElementById('customColorInput').value = '';
+        }
+        
+        // Update modal selected display
+        function updateModalSelectedDisplay() {
+            const sizeContainer = document.getElementById('modal-selected-size');
+            const colorContainer = document.getElementById('modal-selected-color');
+            
+            sizeContainer.innerHTML = modalSelectedSize ? 
+                `<span class="badge bg-primary">${modalSelectedSize}</span>` : 
+                '<span class="text-muted">Chưa chọn kích cỡ</span>';
+                
+            colorContainer.innerHTML = modalSelectedColor ? 
+                `<span class="badge bg-secondary">${modalSelectedColor}</span>` : 
+                '<span class="text-muted">Chưa chọn màu sắc</span>';
+        }
+        
+        // Check for duplicates
+        function checkForDuplicates() {
+            if (!modalSelectedSize || !modalSelectedColor) {
+                document.getElementById('duplicate-warning').style.display = 'none';
+                document.getElementById('saveSizeColorBtn').disabled = true;
+                return;
+            }
+            
+            const currentVariantId = document.getElementById('editSizeColorVariantId').value;
+            
+            // Tìm button của variant hiện tại để lấy current size/color
+            const currentButton = document.querySelector(`button[onclick*="editVariantSizeColor(${currentVariantId}"]`);
+            const currentSize = currentButton?.getAttribute('data-current-size');
+            const currentColor = currentButton?.getAttribute('data-current-color');
+            
+            // Kiểm tra duplicate nhưng loại trừ variant hiện tại
+            const isDuplicate = allVariants.some(variant => 
+                variant.size === modalSelectedSize && variant.color === modalSelectedColor
+            );
+            
+            // Nếu không có thay đổi (giữ nguyên size/color hiện tại) thì cho phép save
+            const isCurrentVariant = modalSelectedSize === currentSize && modalSelectedColor === currentColor;
+            
+            if (isDuplicate && !isCurrentVariant) {
+                document.getElementById('duplicate-warning').style.display = 'block';
+                document.getElementById('saveSizeColorBtn').disabled = true;
+            } else {
+                document.getElementById('duplicate-warning').style.display = 'none';
+                document.getElementById('saveSizeColorBtn').disabled = false;
+            }
+        }
+        
+        // Save size and color changes
+        async function saveSizeColorChanges() {
+            const variantId = document.getElementById('editSizeColorVariantId').value;
+            
+            if (!modalSelectedSize || !modalSelectedColor) {
+                alert('Vui lòng chọn kích cỡ và màu sắc!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/products/variants/${variantId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        size: modalSelectedSize,
+                        color: modalSelectedColor,
+                        stock: null // Keep current stock
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Cập nhật màu sắc và kích cỡ thành công!');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editSizeColorModal'));
+                    modal.hide();
+                    location.reload(); // Reload trang để cập nhật danh sách
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating variant size/color:', error);
+                alert('Có lỗi xảy ra khi cập nhật màu sắc và kích cỡ!');
+            }
+        }
+    </script>
+</body>
+</html>

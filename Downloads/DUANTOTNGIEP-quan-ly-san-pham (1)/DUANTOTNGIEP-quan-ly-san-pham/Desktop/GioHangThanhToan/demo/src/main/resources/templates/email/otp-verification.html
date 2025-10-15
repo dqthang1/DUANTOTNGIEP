@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận đăng ký - Activewear Store</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .otp-container {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .otp-label {
+            font-size: 16px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .expiry-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+            text-align: center;
+        }
+        
+        .security-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #0c5460;
+            font-size: 14px;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .brand {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        
+        .warning {
+            color: #dc3545;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛍️ Activewear Store</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Xác nhận đăng ký tài khoản</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <h2>Xin chào!</h2>
+            
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại <a href="#" class="brand">Activewear Store</a>!</p>
+            
+            <p>Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã xác nhận bên dưới:</p>
+            
+            <!-- OTP Code -->
+            <div class="otp-container">
+                <div class="otp-label">Mã xác nhận của bạn</div>
+                <div class="otp-code" th:text="${otpCode}">123456</div>
+                <p style="margin: 0; color: #6c757d; font-size: 14px;">
+                    Nhập mã này vào trang xác nhận
+                </p>
+            </div>
+            
+            <!-- Expiry Info -->
+            <div class="expiry-info">
+                <strong>⏰ Thời gian hiệu lực:</strong><br>
+                Mã này có hiệu lực trong <strong>10 phút</strong> kể từ khi được gửi.
+            </div>
+            
+            <!-- Security Info -->
+            <div class="security-info">
+                <strong>🔒 Thông tin bảo mật:</strong><br>
+                • Không chia sẻ mã này với bất kỳ ai<br>
+                • Chúng tôi sẽ không bao giờ yêu cầu mã qua điện thoại<br>
+                • Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này
+            </div>
+            
+            <p>Nếu bạn gặp khó khăn trong việc xác nhận, vui lòng liên hệ với chúng tôi qua email hỗ trợ.</p>
+            
+            <p>Chào mừng bạn đến với cộng đồng <a href="#" class="brand">Activewear Store</a>!</p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <strong>Activewear Store</strong><br>
+                Cửa hàng trang phục thể thao hàng đầu Việt Nam<br>
+                📧 Email: support@activewearstore.com<br>
+                📞 Hotline: 0123 456 789
+            </p>
+            <p style="margin-top: 20px; font-size: 12px; color: #adb5bd;">
+                © 2024 Activewear Store. Tất cả quyền được bảo lưu.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

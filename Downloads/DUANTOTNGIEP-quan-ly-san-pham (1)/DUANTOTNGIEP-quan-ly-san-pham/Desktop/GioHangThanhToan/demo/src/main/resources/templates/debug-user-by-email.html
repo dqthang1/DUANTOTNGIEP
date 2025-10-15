@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug User - Activewear Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .debug-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <div class="debug-card">
+            <h2 class="mb-4">
+                <i class="fas fa-user-cog me-2"></i>
+                Debug User Information
+            </h2>
+            
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${success}">Success!</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span th:text="${error}">Error!</span>
+            </div>
+            
+            <div th:if="${found}">
+                <h4 class="mb-3">User Found: <span th:text="${email}">email@example.com</span></h4>
+                
+                <!-- Basic Information -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                    <div class="info-item">
+                        <span class="info-label">ID:</span>
+                        <span class="info-value" th:text="${user.id}">1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value" th:text="${user.ten}">User Name</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" th:text="${user.email}">email@example.com</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value" th:text="${user.soDienThoai != null} ? ${user.soDienThoai} : 'Not provided'">Not provided</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Registration Date:</span>
+                        <span class="info-value" th:text="${#temporals.format(user.ngayDangKy, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                    </div>
+                </div>
+                
+                <!-- Login Conditions -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-sign-in-alt me-2"></i>Login Conditions</h5>
+                    <div class="info-item">
+                        <span class="info-label">Account Active:</span>
+                        <span th:if="${isActive}" class="status-badge status-success">✓ Active</span>
+                        <span th:unless="${isActive}" class="status-badge status-danger">✗ Inactive</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email Verified:</span>
+                        <span th:if="${isEmailVerified}" class="status-badge status-success">✓ Verified</span>
+                        <span th:unless="${isEmailVerified}" class="status-badge status-danger">✗ Not Verified</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Has Role:</span>
+                        <span th:if="${hasRole}" class="status-badge status-success">✓ Yes</span>
+                        <span th:unless="${hasRole}" class="status-badge status-danger">✗ No</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Role Name:</span>
+                        <span class="info-value" th:text="${roleName}">USER</span>
+                    </div>
+                </div>
+                
+                <!-- Password Information -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-lock me-2"></i>Password Information</h5>
+                    <div class="info-item">
+                        <span class="info-label">Password Length:</span>
+                        <span class="info-value" th:text="${passwordLength}">60</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Password Encoded:</span>
+                        <span th:if="${isPasswordEncoded}" class="status-badge status-success">✓ Yes (BCrypt)</span>
+                        <span th:unless="${isPasswordEncoded}" class="status-badge status-danger">✗ No (Plain Text)</span>
+                    </div>
+                </div>
+                
+                <!-- Login Status -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-check-circle me-2"></i>Can Login?</h5>
+                    <div th:if="${isActive && isEmailVerified && hasRole && isPasswordEncoded}" class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Yes, this user can login!</strong> All conditions are met.
+                    </div>
+                    <div th:unless="${isActive && isEmailVerified && hasRole && isPasswordEncoded}" class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>No, this user cannot login.</strong> Missing conditions:
+                        <ul class="mb-0 mt-2">
+                            <li th:unless="${isActive}">Account is not active</li>
+                            <li th:unless="${isEmailVerified}">Email is not verified</li>
+                            <li th:unless="${hasRole}">User has no role assigned</li>
+                            <li th:unless="${isPasswordEncoded}">Password is not properly encoded</li>
+                        </ul>
+                        
+                        <!-- Fix button for inactive account -->
+                        <div th:if="${!isActive && isEmailVerified}" class="mt-3">
+                            <form th:action="@{/debug/activate-user}" method="post" style="display: inline;">
+                                <input type="hidden" name="email" th:value="${email}">
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-unlock me-2"></i>Kích hoạt tài khoản
+                                </button>
+                            </form>
+                            <small class="text-muted d-block mt-1">Click để kích hoạt tài khoản này</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:unless="${found}">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>User not found:</strong> No user with email <span th:text="${email}">email@example.com</span> exists in the database.
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>Back to Home
+                </a>
+                <a href="/login" class="btn btn-secondary ms-2">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login Page
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

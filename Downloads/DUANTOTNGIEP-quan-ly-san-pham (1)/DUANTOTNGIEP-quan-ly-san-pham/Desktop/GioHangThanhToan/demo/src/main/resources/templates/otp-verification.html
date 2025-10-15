@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận Email - Activewear Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #ffffff;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            position: relative;
+        }
+        
+        /* Subtle gradient edges */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, rgba(138, 43, 226, 0.03) 0%, transparent 25%),
+                linear-gradient(225deg, rgba(30, 144, 255, 0.03) 0%, transparent 25%),
+                linear-gradient(315deg, rgba(138, 43, 226, 0.03) 0%, transparent 25%),
+                linear-gradient(45deg, rgba(30, 144, 255, 0.03) 0%, transparent 25%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: #343a40 !important;
+        }
+        
+        .nav-link {
+            color: #6c757d !important;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: #343a40 !important;
+        }
+        
+        /* Main Container */
+        .main-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            min-height: calc(100vh - 76px);
+        }
+        
+        /* OTP Container */
+        .otp-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .otp-header {
+            background: #ffffff;
+            color: #343a40;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .otp-header h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #343a40;
+        }
+        
+        .otp-header p {
+            color: #6c757d;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+        
+        .otp-body {
+            padding: 2rem;
+        }
+        
+        /* Email Info */
+        .email-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .email-info .email-text {
+            font-weight: 600;
+            color: #343a40;
+        }
+        
+        /* OTP Input */
+        .otp-input-container {
+            margin-bottom: 2rem;
+        }
+        
+        .otp-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #dadce0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .otp-input:focus {
+            border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+            outline: none;
+        }
+        
+        .otp-input.error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .otp-input.success {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        /* Form Styles */
+        .form-label {
+            font-weight: 500;
+            color: #343a40;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Button Styles */
+        .btn-verify {
+            background: #343a40;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-verify:hover {
+            background: #23272b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(52, 58, 64, 0.3);
+        }
+        
+        .btn-resend {
+            background: transparent;
+            color: #6c757d;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-resend:hover {
+            background: #f8f9fa;
+            border-color: #4285f4;
+            color: #4285f4;
+        }
+        
+        .btn-resend:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Alert Styles */
+        .alert {
+            border-radius: 8px;
+            border: none;
+            padding: 12px 16px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-success {
+            background: #d1edff;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        /* Timer */
+        .timer {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .timer.warning {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        /* Help Text */
+        .help-text {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #0d47a1;
+        }
+        
+        .help-text h6 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+                max-width: none;
+            }
+            
+            .otp-header {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+            
+            .otp-body {
+                padding: 1.5rem;
+            }
+            
+            .otp-header h3 {
+                font-size: 1.6rem;
+            }
+            
+            .otp-input {
+                font-size: 1.1rem;
+                letter-spacing: 0.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 15px 10px;
+            }
+            
+            .otp-header, .otp-body {
+                padding: 1.5rem 1rem;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .otp-container {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        /* Loading state */
+        .btn-verify:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Focus states for accessibility */
+        .otp-input:focus,
+        .btn-verify:focus,
+        .btn-resend:focus {
+            outline: 2px solid #4285f4;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shopping-bag me-2"></i>Activewear Store
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
+                    <a class="nav-link" href="/products">
+                        <i class="fas fa-store me-1"></i>Sản phẩm
+                    </a>
+                    <a class="nav-link" href="/login">
+                        <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="otp-container">
+            <div class="otp-header">
+                <h3><i class="fas fa-envelope-open-text me-2"></i>Xác nhận Email</h3>
+                <p>Nhập mã xác nhận đã được gửi đến email của bạn</p>
+            </div>
+            <div class="otp-body">
+                <!-- Hiển thị lỗi nếu có -->
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}">Có lỗi xảy ra!</span>
+                </div>
+                
+                <!-- Hiển thị thông báo thành công -->
+                <div th:if="${success}" class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Thành công!</span>
+                </div>
+                
+                <!-- Email Info -->
+                <div class="email-info">
+                    <i class="fas fa-envelope me-2"></i>
+                    <span class="email-text" th:text="${email}">user@example.com</span>
+                </div>
+                
+                <!-- Timer -->
+                <div class="timer" id="timer">
+                    <i class="fas fa-clock me-1"></i>
+                    Mã có hiệu lực trong <span id="countdown">10:00</span>
+                </div>
+                
+                <!-- OTP Verification Form -->
+                <form th:action="@{/verify-otp}" method="post" id="otpForm">
+                    <input type="hidden" name="email" th:value="${email}">
+                    
+                    <div class="otp-input-container">
+                        <label for="otpCode" class="form-label">
+                            <i class="fas fa-key me-2"></i>Mã xác nhận (6 chữ số)
+                        </label>
+                        <input type="text" 
+                               class="otp-input" 
+                               id="otpCode" 
+                               name="otpCode" 
+                               placeholder="000000"
+                               maxlength="6"
+                               pattern="[0-9]{6}"
+                               required
+                               autocomplete="off">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-verify" id="verifyBtn">
+                        <i class="fas fa-check me-2"></i>Xác nhận
+                    </button>
+                </form>
+                
+                <!-- Resend OTP Form -->
+                <form th:action="@{/resend-otp}" method="post" id="resendForm">
+                    <input type="hidden" name="email" th:value="${email}">
+                    <button type="submit" class="btn btn-resend" id="resendBtn" disabled>
+                        <i class="fas fa-redo me-2"></i>Gửi lại mã (<span id="resendCountdown">60</span>s)
+                    </button>
+                </form>
+                
+                <!-- Help Text -->
+                <div class="help-text">
+                    <h6><i class="fas fa-info-circle me-2"></i>Hướng dẫn:</h6>
+                    <ul class="mb-0">
+                        <li>Kiểm tra hộp thư đến và thư mục spam</li>
+                        <li>Mã xác nhận có 6 chữ số và có hiệu lực trong 10 phút</li>
+                        <li>Bạn có thể gửi lại mã sau 60 giây</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // OTP Input handling
+        const otpInput = document.getElementById('otpCode');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const resendBtn = document.getElementById('resendBtn');
+        const resendForm = document.getElementById('resendForm');
+        
+        // Timer for OTP expiry (10 minutes)
+        let otpTimeLeft = 10 * 60; // 10 minutes in seconds
+        const otpTimer = setInterval(() => {
+            const minutes = Math.floor(otpTimeLeft / 60);
+            const seconds = otpTimeLeft % 60;
+            document.getElementById('countdown').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (otpTimeLeft <= 60) {
+                document.getElementById('timer').classList.add('warning');
+            }
+            
+            if (otpTimeLeft <= 0) {
+                clearInterval(otpTimer);
+                document.getElementById('timer').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle me-1"></i>Mã đã hết hạn';
+                otpInput.disabled = true;
+                verifyBtn.disabled = true;
+            }
+            otpTimeLeft--;
+        }, 1000);
+        
+        // Timer for resend button (60 seconds)
+        let resendTimeLeft = 60;
+        const resendTimer = setInterval(() => {
+            document.getElementById('resendCountdown').textContent = resendTimeLeft;
+            
+            if (resendTimeLeft <= 0) {
+                clearInterval(resendTimer);
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Gửi lại mã';
+            }
+            resendTimeLeft--;
+        }, 1000);
+        
+        // OTP Input formatting
+        otpInput.addEventListener('input', function() {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // Remove error/success classes when typing
+            this.classList.remove('error', 'success');
+            
+            // Enable verify button when 6 digits entered
+            verifyBtn.disabled = this.value.length !== 6;
+        });
+        
+        // Form submission handling
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
+            const otpCode = otpInput.value;
+            
+            if (otpCode.length !== 6) {
+                e.preventDefault();
+                otpInput.classList.add('error');
+                otpInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xác nhận...';
+        });
+        
+        // Resend form handling
+        resendForm.addEventListener('submit', function(e) {
+            // Show loading state
+            resendBtn.disabled = true;
+            resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang gửi...';
+        });
+        
+        // Auto-focus on OTP input
+        otpInput.focus();
+        
+        // Handle paste event
+        otpInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+            if (pastedData.length === 6) {
+                this.value = pastedData;
+                verifyBtn.disabled = false;
+                this.classList.remove('error');
+            }
+        });
+        
+        // Handle Enter key
+        otpInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.length === 6) {
+                document.getElementById('otpForm').submit();
+            }
+        });
+    </script>
+</body>
+</html>
