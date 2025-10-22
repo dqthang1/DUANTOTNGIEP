@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Khuyến Mãi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9fafb;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2b6cb0;
+        }
+
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        input {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #2b6cb0;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #2b6cb0;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: #1e4e8c;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2b6cb0;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        a {
+            color: #2b6cb0;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .link-bottom {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h2>Danh sách khuyến mãi</h2>
+
+<form method="get" action="/khuyenmai">
+    <input name="search" placeholder="Tìm theo tên">
+    <button>Tìm</button>
+</form>
+
+<form th:action="@{/khuyenmai/save}" method="post" th:object="${newKM}">
+    <input th:field="*{ten}" placeholder="Tên KM">
+    <input th:field="*{moTa}" placeholder="Mô tả">
+    <input th:field="*{phanTramGiam}" placeholder="% giảm">
+    <button>Lưu</button>
+</form>
+
+<table border="1">
+    <tr><th>Tên</th><th>Mô tả</th><th>% giảm</th><th>Xử lý</th></tr>
+    <tr th:each="km : ${list}">
+        <td th:text="${km.ten}"></td>
+        <td th:text="${km.moTa}"></td>
+        <td th:text="${km.phanTramGiam}"></td>
+        <td><a th:href="@{'/khuyenmai/delete/' + ${km.id}}">Xóa</a></td>
+    </tr>
+</table>
+
+<a class="link-bottom" href="/sanpham">Danh sách Sản Phẩm</a>
+</body>
+</html>

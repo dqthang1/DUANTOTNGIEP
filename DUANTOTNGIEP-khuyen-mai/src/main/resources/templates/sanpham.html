@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Sản Phẩm</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            margin: 40px;
+            background: #f7f7f7;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #2d89ef;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1b5fbd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: #2d89ef;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        select {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        a {
+            text-decoration: none;
+            color: #2d89ef;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #4caf50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .back-link:hover {
+            background: #388e3c;
+        }
+
+        /* Cột giá */
+        td:nth-child(2), td:nth-child(4) {
+            text-align: right;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Danh sách sản phẩm</h2>
+
+
+<table>
+    <tr>
+        <th>Tên</th>
+        <th>Giá gốc</th>
+        <th>Khuyến mãi</th>
+        <th>Giá sau giảm</th>
+        <th>Thao tác</th>
+    </tr>
+    <tr th:each="sp : ${listSP}">
+        <td th:text="${sp.ten}"></td>
+        <td th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+        <td th:text="${sp.khuyenMai != null ? sp.khuyenMai.ten + ' (' + sp.khuyenMai.phanTramGiam + '%)' : 'Không'}"></td>
+        <td th:text="${sp.khuyenMai != null ? #numbers.formatDecimal(sp.gia * (1 - sp.khuyenMai.phanTramGiam/100), 0, 'COMMA', 0, 'POINT') + ' đ' : #numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT') + ' đ'}"></td>
+
+        <td>
+            <a th:href="@{'/sanpham/delete/' + ${sp.id}}">Xóa</a> |
+            <select onchange="if(this.value) window.location=this.value">
+                <option value="">-- Áp dụng KM --</option>
+                <option th:each="km : ${listKM}"
+                        th:value="@{'/sanpham/apdung/' + ${sp.id} + '/' + ${km.id}}"
+                        th:text="${km.ten + ' (' + km.phanTramGiam + '%)'}">
+                </option>
+            </select> |
+            <a th:href="@{'/sanpham/huy/' + ${sp.id}}">Hủy KM</a>
+        </td>
+    </tr>
+</table>
+
+<a href="/khuyenmai" class="back-link">↩ Quản lý Khuyến Mãi</a>
+
+</body>
+</html>
