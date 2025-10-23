@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Biến thể - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .variant-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .color-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+            vertical-align: middle;
+        }
+        .stat-card {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/admin/product-management}">
+                <i class="fas fa-arrow-left me-2"></i>Quản lý Biến thể
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin/product-management">
+                    <i class="fas fa-box me-1"></i>Sản phẩm
+                </a>
+                <a class="nav-link" href="/admin/inventory">
+                    <i class="fas fa-warehouse me-1"></i>Tồn kho
+                </a>
+                <a class="nav-link" href="/admin/promotion-management">
+                    <i class="fas fa-gift me-1"></i>Khuyến mãi
+                </a>
+                <a class="nav-link" href="/admin">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>Trang chủ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Product Info -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <img th:src="${product.anhChinh ?: '/images/no-image.svg'}" 
+                             th:alt="${product.ten}"
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px;">
+                    </div>
+                    <div class="col">
+                        <h4 class="mb-1" th:text="${product.ten}">Product Name</h4>
+                        <p class="text-muted mb-0">
+                            <code th:text="${product.maSanPham}">SKU</code> | 
+                            <span th:text="${product.danhMucTen}">Category</span> | 
+                            <span th:text="${product.thuongHieuTen}">Brand</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Tổng biến thể</h6>
+                            <h3 class="mb-0" th:text="${stats.totalVariants}">0</h3>
+                        </div>
+                        <i class="fas fa-layer-group fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Còn hàng</h6>
+                            <h3 class="mb-0" th:text="${stats.inStockVariants}">0</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-danger text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Hết hàng</h6>
+                            <h3 class="mb-0" th:text="${stats.outOfStockVariants}">0</h3>
+                        </div>
+                        <i class="fas fa-times-circle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Variants Table -->
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-layer-group me-2"></i>Danh sách Biến thể
+                </h5>
+                <button class="btn btn-light btn-sm" onclick="showCreateModal()">
+                    <i class="fas fa-plus me-2"></i>Thêm biến thể
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="10%">Ảnh</th>
+                                <th width="15%">SKU</th>
+                                <th width="10%">Màu sắc</th>
+                                <th width="10%">Kích cỡ</th>
+                                <th width="12%">Giá bán</th>
+                                <th width="10%">Tồn kho</th>
+                                <th width="10%">Trạng thái</th>
+                                <th width="18%">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${variants.isEmpty()}">
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                                    <p>Chưa có biến thể nào. Click "Thêm biến thể" để tạo mới.</p>
+                                </td>
+                            </tr>
+                            <tr th:each="variant, iterStat : ${variants}">
+                                <td th:text="${iterStat.count}">1</td>
+                                <td>
+                                    <img th:src="${variant.anhBienThe ?: product.anhChinh ?: '/images/no-image.svg'}" 
+                                         th:alt="${variant.mauSac}"
+                                         class="variant-img">
+                                </td>
+                                <td>
+                                    <code th:text="${variant.maSku}">SKU</code>
+                                </td>
+                                <td>
+                                    <span th:text="${variant.mauSac}" class="me-2">Color</span>
+                                </td>
+                                <td>
+                                    <strong th:text="${variant.kichCo}">Size</strong>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong th:text="${#numbers.formatDecimal(variant.giaBan, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</strong>
+                                    </div>
+                                    <div th:if="${variant.giaKhuyenMai != null}" class="text-danger small">
+                                        KM: <span th:text="${#numbers.formatDecimal(variant.giaKhuyenMai, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong th:text="${variant.soLuongTon}" 
+                                            th:classappend="${variant.soLuongTon == 0} ? 'text-danger' : (${variant.soLuongTon < 10} ? 'text-warning' : 'text-success')">
+                                        0
+                                    </strong>
+                                </td>
+                                <td>
+                                    <span th:if="${variant.hienThi}" class="badge bg-success">Hiển thị</span>
+                                    <span th:unless="${variant.hienThi}" class="badge bg-secondary">Ẩn</span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                            th:attr="data-id=${variant.id}"
+                                            onclick="editVariant(this.dataset.id)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-warning"
+                                            th:attr="data-id=${variant.id}"
+                                            onclick="toggleVisibility(this.dataset.id)">
+                                        <i class="fas fa-eye-slash"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                            th:attr="data-id=${variant.id},data-name='${variant.mauSac} - ${variant.kichCo}'"
+                                            onclick="deleteVariant(this.dataset.id, this.dataset.name)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal fade" id="variantModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">
+                        <i class="fas fa-plus me-2"></i>Thêm biến thể mới
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="createTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="single-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#singleCreate" type="button">
+                                <i class="fas fa-plus me-2"></i>Tạo đơn lẻ
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bulk-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#bulkCreate" type="button">
+                                <i class="fas fa-magic me-2"></i>Tạo hàng loạt
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <!-- Tab 1: Single Create -->
+                        <div class="tab-pane fade show active" id="singleCreate">
+                            <form id="variantForm">
+                        <input type="hidden" id="variantId">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Màu sắc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="mauSac" required 
+                                           placeholder="Ví dụ: Đỏ, Xanh, Trắng...">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Kích cỡ <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="kichCo" required 
+                                           placeholder="Ví dụ: S, M, L, XL, 39, 40...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Giá bán (₫) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="giaBan" required min="1" step="1000"
+                                           placeholder="500000">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Giá khuyến mãi (₫)</label>
+                                    <input type="number" class="form-control" id="giaKhuyenMai" min="0" step="1000"
+                                           placeholder="450000">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Số lượng tồn <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="soLuongTon" required min="0"
+                                           placeholder="100">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Trọng lượng (g)</label>
+                                    <input type="number" class="form-control" id="trongLuong" min="0" step="0.01"
+                                           placeholder="500">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh biến thể (URL)</label>
+                            <input type="text" class="form-control" id="anhBienThe" 
+                                   placeholder="https://example.com/image.jpg">
+                            <small class="text-muted">Để trống sẽ dùng ảnh chính của sản phẩm</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="hienThi" checked>
+                                <label class="form-check-label" for="hienThi">
+                                    Hiển thị trên website
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" id="trangThaiGroup" style="display: none;">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="trangThai" checked>
+                                <label class="form-check-label" for="trangThai">
+                                    Trạng thái hoạt động
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                        </div>
+                        
+                        <!-- Tab 2: Bulk Create -->
+                        <div class="tab-pane fade" id="bulkCreate">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Tạo hàng loạt biến thể</strong><br>
+                                Nhập nhiều màu sắc và kích cỡ, phân cách bằng dấu phẩy. Hệ thống sẽ tự động tạo tất cả các tổ hợp.
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Màu sắc <span class="text-danger">*</span>
+                                    <small class="text-muted">(Phân cách bằng dấu phẩy)</small>
+                                </label>
+                                <input type="text" class="form-control" id="bulkColors" required
+                                       placeholder="Đỏ, Xanh Navy, Trắng, Đen"
+                                       oninput="updateBulkPreview()">
+                                <small class="text-muted">Ví dụ: Đỏ, Xanh, Trắng</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Kích cỡ <span class="text-danger">*</span>
+                                    <small class="text-muted">(Phân cách bằng dấu phẩy)</small>
+                                </label>
+                                <input type="text" class="form-control" id="bulkSizes" required
+                                       placeholder="S, M, L, XL, XXL"
+                                       oninput="updateBulkPreview()">
+                                <small class="text-muted">Ví dụ: S, M, L, XL hoặc 39, 40, 41, 42</small>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Giá bán chung (₫) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="bulkGiaBan" required min="1" step="1000"
+                                               value="500000">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Giá KM chung (₫)</label>
+                                        <input type="number" class="form-control" id="bulkGiaKM" min="0" step="1000"
+                                               placeholder="450000">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Số lượng tồn mỗi biến thể <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="bulkStock" required min="0"
+                                       value="100">
+                            </div>
+                            
+                            <div class="alert alert-success">
+                                <i class="fas fa-magic me-2"></i>
+                                Sẽ tạo <strong id="bulkVariantCount">0</strong> biến thể
+                                <div id="bulkPreview" class="mt-2 small"></div>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="skipDuplicates" checked>
+                                <label class="form-check-label" for="skipDuplicates">
+                                    Bỏ qua các biến thể đã tồn tại
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="submitBtn" onclick="submitVariant()">
+                        <i class="fas fa-save me-2"></i>Lưu
+                    </button>
+                    <button type="button" class="btn btn-success" id="bulkSubmitBtn" style="display: none;" onclick="submitBulkCreate()">
+                        <i class="fas fa-magic me-2"></i>Tạo tất cả
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const productId = /*[[${product.id}]]*/ 0;
+        const csrfToken = /*[[${_csrf.token}]]*/ '';
+        const csrfHeader = /*[[${_csrf.headerName}]]*/ '';
+        
+        let variantModal;
+        let isEditMode = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            variantModal = new bootstrap.Modal(document.getElementById('variantModal'));
+            
+            // Tab switching logic
+            document.querySelectorAll('#createTabs button').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function (e) {
+                    if (e.target.id === 'bulk-tab') {
+                        // Show bulk button, hide single button
+                        document.getElementById('submitBtn').style.display = 'none';
+                        document.getElementById('bulkSubmitBtn').style.display = 'inline-block';
+                    } else {
+                        // Show single button, hide bulk button
+                        document.getElementById('submitBtn').style.display = 'inline-block';
+                        document.getElementById('bulkSubmitBtn').style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Show create modal
+        function showCreateModal() {
+            isEditMode = false;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Thêm biến thể mới';
+            document.getElementById('variantForm').reset();
+            document.getElementById('variantId').value = '';
+            document.getElementById('trangThaiGroup').style.display = 'none';
+            document.getElementById('hienThi').checked = true;
+            variantModal.show();
+        }
+        
+        // Edit variant
+        async function editVariant(variantId) {
+            isEditMode = true;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật biến thể';
+            document.getElementById('trangThaiGroup').style.display = 'block';
+            
+            try {
+                const response = await fetch(`/admin/product/${productId}/variants/api/${variantId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const variant = result.data;
+                    
+                    document.getElementById('variantId').value = variant.id;
+                    document.getElementById('mauSac').value = variant.mauSac;
+                    document.getElementById('kichCo').value = variant.kichCo;
+                    document.getElementById('giaBan').value = variant.giaBan;
+                    document.getElementById('giaKhuyenMai').value = variant.giaKhuyenMai || '';
+                    document.getElementById('soLuongTon').value = variant.soLuongTon;
+                    document.getElementById('trongLuong').value = variant.trongLuong || '';
+                    document.getElementById('anhBienThe').value = variant.anhBienThe || '';
+                    document.getElementById('hienThi').checked = variant.hienThi;
+                    document.getElementById('trangThai').checked = variant.trangThai;
+                    
+                    variantModal.show();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Không thể tải thông tin biến thể!');
+            }
+        }
+        
+        // Submit variant (create or update)
+        async function submitVariant() {
+            const variantId = document.getElementById('variantId').value;
+            const data = {
+                mauSac: document.getElementById('mauSac').value.trim(),
+                kichCo: document.getElementById('kichCo').value.trim(),
+                giaBan: parseFloat(document.getElementById('giaBan').value),
+                giaKhuyenMai: document.getElementById('giaKhuyenMai').value ? parseFloat(document.getElementById('giaKhuyenMai').value) : null,
+                soLuongTon: parseInt(document.getElementById('soLuongTon').value),
+                trongLuong: document.getElementById('trongLuong').value ? parseFloat(document.getElementById('trongLuong').value) : null,
+                anhBienThe: document.getElementById('anhBienThe').value.trim() || null,
+                hienThi: document.getElementById('hienThi').checked
+            };
+            
+            // Add trangThai for edit mode
+            if (isEditMode) {
+                data.trangThai = document.getElementById('trangThai').checked;
+            }
+            
+            // Validation
+            if (!data.mauSac || !data.kichCo) {
+                alert('Vui lòng nhập đầy đủ màu sắc và kích cỡ!');
+                return;
+            }
+            
+            if (!data.giaBan || data.giaBan <= 0) {
+                alert('Giá bán phải lớn hơn 0!');
+                return;
+            }
+            
+            if (data.soLuongTon < 0) {
+                alert('Số lượng tồn không được âm!');
+                return;
+            }
+            
+            try {
+                let url, method;
+                
+                if (isEditMode) {
+                    url = `/admin/product/${productId}/variants/api/${variantId}`;
+                    method = 'PUT';
+                } else {
+                    url = `/admin/product/${productId}/variants/api/create`;
+                    method = 'POST';
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        }
+        
+        // Delete variant
+        async function deleteVariant(variantId, variantName) {
+            if (!confirm(`Bạn có chắc muốn xóa biến thể "${variantName}"?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/product/${productId}/variants/api/${variantId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        }
+        
+        // Toggle visibility
+        async function toggleVisibility(variantId) {
+            try {
+                const response = await fetch(`/admin/product/${productId}/variants/api/${variantId}/toggle-visibility`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        }
+        
+        // ========== BULK CREATE FUNCTIONS ==========
+        
+        // Update bulk preview
+        function updateBulkPreview() {
+            const colorsInput = document.getElementById('bulkColors').value;
+            const sizesInput = document.getElementById('bulkSizes').value;
+            
+            const colors = colorsInput.split(',').map(c => c.trim()).filter(c => c);
+            const sizes = sizesInput.split(',').map(s => s.trim()).filter(s => s);
+            
+            const count = colors.length * sizes.length;
+            document.getElementById('bulkVariantCount').textContent = count;
+            
+            // Show preview
+            const previewDiv = document.getElementById('bulkPreview');
+            if (count > 0 && count <= 20) {
+                let preview = '<strong>Danh sách sẽ tạo:</strong><br>';
+                const samples = [];
+                for (let i = 0; i < Math.min(5, colors.length); i++) {
+                    for (let j = 0; j < Math.min(4, sizes.length); j++) {
+                        samples.push(`${colors[i]} - ${sizes[j]}`);
+                        if (samples.length >= 10) break;
+                    }
+                    if (samples.length >= 10) break;
+                }
+                preview += samples.join(', ');
+                if (count > 10) {
+                    preview += `, ... (và ${count - 10} biến thể khác)`;
+                }
+                previewDiv.innerHTML = preview;
+            } else if (count > 20) {
+                previewDiv.innerHTML = `<strong class="text-warning">⚠️ Sẽ tạo ${count} biến thể. Đảm bảo thông tin chính xác!</strong>`;
+            } else {
+                previewDiv.innerHTML = '';
+            }
+        }
+        
+        // Submit bulk create
+        async function submitBulkCreate() {
+            const colorsInput = document.getElementById('bulkColors').value.trim();
+            const sizesInput = document.getElementById('bulkSizes').value.trim();
+            const price = parseFloat(document.getElementById('bulkGiaBan').value);
+            const priceKM = document.getElementById('bulkGiaKM').value ? parseFloat(document.getElementById('bulkGiaKM').value) : null;
+            const stock = parseInt(document.getElementById('bulkStock').value);
+            const skipDuplicates = document.getElementById('skipDuplicates').checked;
+            
+            // Validation
+            if (!colorsInput || !sizesInput) {
+                alert('Vui lòng nhập màu sắc và kích cỡ!');
+                return;
+            }
+            
+            if (!price || price <= 0) {
+                alert('Giá bán phải lớn hơn 0!');
+                return;
+            }
+            
+            if (stock < 0) {
+                alert('Số lượng tồn không được âm!');
+                return;
+            }
+            
+            const colors = colorsInput.split(',').map(c => c.trim()).filter(c => c);
+            const sizes = sizesInput.split(',').map(s => s.trim()).filter(s => s);
+            
+            if (colors.length === 0 || sizes.length === 0) {
+                alert('Danh sách màu sắc và kích cỡ không hợp lệ!');
+                return;
+            }
+            
+            const totalVariants = colors.length * sizes.length;
+            if (!confirm(`Bạn sắp tạo ${totalVariants} biến thể. Tiếp tục?`)) {
+                return;
+            }
+            
+            // Disable button to prevent double click
+            const btn = document.getElementById('bulkSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tạo...';
+            
+            try {
+                const response = await fetch(`/admin/product/${productId}/variants/api/bulk-create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({
+                        colors: colors,
+                        sizes: sizes,
+                        defaultPrice: price,
+                        defaultPromotionPrice: priceKM,
+                        defaultStock: stock,
+                        skipDuplicates: skipDuplicates
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    let message = result.message;
+                    
+                    // Show detailed result
+                    if (result.skipped && result.skipped.length > 0) {
+                        message += '\n\nBỏ qua (đã tồn tại): ' + result.skipped.join(', ');
+                    }
+                    
+                    if (result.errors && result.errors.length > 0) {
+                        message += '\n\nLỗi: ' + result.errors.join(', ');
+                    }
+                    
+                    alert(message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-magic me-2"></i>Tạo tất cả';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic me-2"></i>Tạo tất cả';
+            }
+        }
+    </script>
+</body>
+</html>
+

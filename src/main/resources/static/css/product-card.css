@@ -1,0 +1,386 @@
+/* ============================================
+   PRODUCT CARD COMPONENT - PLP Style
+   Dùng chung cho homepage & products.html
+   ============================================ */
+
+:root {
+    /* PLP-specific variables */
+    --plp-img-ratio: 4 / 5;
+    --plp-gutter-desktop: 24px;
+    --plp-gutter-tablet: 20px;
+    --plp-gutter-mobile: 16px;
+    --plp-row-gap-desktop: 28px;
+    --plp-row-gap-tablet: 24px;
+    --plp-row-gap-mobile: 20px;
+}
+
+/* Grid Layout - Responsive Columns */
+.plp-products-grid {
+    display: grid;
+    gap: var(--plp-row-gap-desktop) var(--plp-gutter-desktop);
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* 5 columns for large screens */
+@media (min-width: 1440px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* 4 columns for desktop */
+@media (min-width: 1280px) and (max-width: 1439px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 3 columns for tablet */
+@media (min-width: 768px) and (max-width: 1279px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--plp-row-gap-tablet) var(--plp-gutter-tablet);
+    }
+}
+
+/* 2 columns for mobile */
+@media (max-width: 767px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--plp-row-gap-mobile) var(--plp-gutter-mobile);
+    }
+}
+
+/* Product Card */
+.plp-product-card {
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.plp-product-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* Image Container - 4:5 ratio */
+.plp-product-image {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: #F6F7F9;
+    border-radius: 12px;
+    overflow: visible; /* Changed from hidden to visible để hiện quick actions */
+    margin: 12px 12px 12px 12px;
+    width: calc(100% - 24px);
+    flex-shrink: 0;
+}
+
+/* Wrap image trong container để maintain border radius */
+.plp-product-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.plp-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.plp-product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.plp-product-card:hover .plp-product-image img {
+    transform: scale(1.05);
+}
+
+.plp-product-card:hover .quick-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Badge - Top Right */
+.plp-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    height: 22px;
+    padding: 0 8px;
+    background: #FF6A2B;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.plp-badge.new-arrival {
+    background: #FF6A2B;
+}
+
+.plp-badge.online-exclusive {
+    background: #3F6AD8;
+}
+
+/* Wishlist Button - Top Left on Hover */
+.plp-wishlist-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.plp-product-card:hover .plp-wishlist-btn {
+    opacity: 1;
+}
+
+.plp-wishlist-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+/* Product Info */
+.plp-product-info {
+    padding: 0 12px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+/* Brand */
+.plp-product-brand {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6B7280;
+    margin-bottom: 4px;
+}
+
+/* Product Name */
+.plp-product-name {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #22252E;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 44px;
+}
+
+/* Price Container */
+.plp-product-price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    min-height: 40px;
+}
+
+.plp-price-original {
+    font-size: 12px;
+    color: #9CA3AF;
+    text-decoration: line-through;
+    font-weight: 400;
+}
+
+.plp-price-current {
+    font-size: 15px;
+    font-weight: 600;
+    color: #E11D48;
+}
+
+/* Swatches */
+.plp-swatches {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.plp-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #D1D5DB;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.plp-swatch:hover {
+    border-color: #22252E;
+    transform: scale(1.1);
+}
+
+.plp-swatch.selected {
+    border: 2px solid #22252E;
+}
+
+.plp-swatch-more {
+    font-size: 11px;
+    color: #7A7D86;
+    font-weight: 500;
+}
+
+/* Quick Action Buttons - Hiện ở giữa ảnh khi hover */
+.quick-actions {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+}
+
+.quick-action-btn {
+    min-width: 120px;
+    height: 40px;
+    padding: 0 16px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1F2937;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quick-action-btn:hover {
+    background: #3F6AD8;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(63, 106, 216, 0.3);
+}
+
+.quick-action-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.quick-action-btn.btn-options:hover {
+    background: #3F6AD8;
+}
+
+.quick-action-btn.btn-quick-view:hover {
+    background: #345BC0;
+}
+
+/* Mobile touch targets */
+@media (max-width: 767px) {
+    .quick-actions {
+        bottom: 12px;
+        gap: 6px;
+    }
+    
+    .quick-action-btn {
+        min-width: 90px;
+        height: 36px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+    
+    .quick-action-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .plp-swatch {
+        width: 24px;
+        height: 24px;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 6px;
+    }
+}
+
+/* Out of Stock State */
+.plp-product-card.out-of-stock .plp-product-image::after {
+    content: 'HẾT HÀNG';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #22252E;
+}
+
+.plp-product-card.out-of-stock .plp-product-image img {
+    opacity: 0.3;
+}
+
+.plp-product-card.out-of-stock .plp-swatches {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Skeleton Loading */
+.plp-product-skeleton {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.plp-product-skeleton .plp-product-image {
+    background: linear-gradient(90deg, #F6F7F9 25%, #E5E7EB 50%, #F6F7F9 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận yêu cầu hỗ trợ</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1F2937;
+            background-color: #F7F8FA;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #3F6AD8 0%, #345BC0 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .email-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1F2937;
+        }
+        
+        .reference-info {
+            background: #E8F0FE;
+            border: 1px solid #3F6AD8;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .reference-code {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3F6AD8;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            background: #F7F8FA;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #6B7280;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            color: #1F2937;
+            font-size: 16px;
+        }
+        
+        .sla-info {
+            background: #F0FDF4;
+            border: 1px solid #16A34A;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .sla-info h3 {
+            color: #16A34A;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .sla-info p {
+            margin: 0;
+            color: #1F2937;
+        }
+        
+        .contact-info {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .contact-info h3 {
+            color: #F59E0B;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .contact-info p {
+            margin: 0;
+            color: #1F2937;
+        }
+        
+        .contact-info .phone {
+            font-size: 20px;
+            font-weight: 700;
+            color: #16A34A;
+            margin: 10px 0;
+        }
+        
+        .footer {
+            background: #F7F8FA;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #E6E8EF;
+        }
+        
+        .footer p {
+            margin: 0;
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        .footer .company-name {
+            font-weight: 600;
+            color: #3F6AD8;
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #3F6AD8;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background: #345BC0;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6B7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4B5563;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .email-header, .email-body, .footer {
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reference-code {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>Activewear Store</h1>
+            <p>Xác nhận yêu cầu hỗ trợ</p>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <div class="greeting">
+                Xin chào <strong th:text="${name}">Khách hàng</strong>,
+            </div>
+            
+            <p>Cảm ơn bạn đã liên hệ với Activewear Store. Chúng tôi đã nhận được yêu cầu hỗ trợ của bạn.</p>
+            
+            <!-- Reference Information -->
+            <div class="reference-info">
+                <div class="reference-code" th:text="${referenceCode}">#HT-2025-023</div>
+                <p style="text-align: center; margin: 0; color: #6B7280; font-size: 14px;">
+                    Mã tham chiếu yêu cầu hỗ trợ
+                </p>
+            </div>
+            
+            <!-- Request Details -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Chủ đề</div>
+                    <div class="info-value" th:text="${subject}">Hỗ trợ đơn hàng</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Bộ phận</div>
+                    <div class="info-value" th:text="${department}">Dịch vụ khách hàng</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Thời gian gửi</div>
+                    <div class="info-value" th:text="${timestamp}">18/01/2025 14:30</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value" th:text="${email}">customer@example.com</div>
+                </div>
+            </div>
+            
+            <!-- SLA Information -->
+            <div class="sla-info">
+                <h3>⏰ Thời gian phản hồi</h3>
+                <p>Chúng tôi sẽ phản hồi trong vòng <strong>24 giờ làm việc</strong><br>
+                (Thứ 2 - Thứ 6: 8:00 - 22:00)</p>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h3>📞 Liên hệ nhanh</h3>
+                <p>Nếu bạn cần hỗ trợ gấp, vui lòng gọi:</p>
+                <div class="phone">1900 1234</div>
+                <p>Hoặc sử dụng chat trực tiếp trên website</p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a th:href="@{/hotline}" class="btn">Xem trang hỗ trợ</a>
+                <a th:href="@{/orders}" class="btn btn-secondary">Theo dõi đơn hàng</a>
+                <a th:href="@{/hotline}" class="btn btn-secondary">Cập nhật yêu cầu</a>
+            </div>
+            
+            <p style="color: #6B7280; font-size: 14px; margin-top: 30px;">
+                <strong>Lưu ý:</strong> Vui lòng giữ lại mã tham chiếu <span th:text="${referenceCode}">#HT-2025-023</span> 
+                để thuận tiện cho việc tra cứu và theo dõi yêu cầu của bạn.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="company-name">Activewear Store</div>
+            <p>Cửa hàng thời trang thể thao hàng đầu Việt Nam</p>
+            <p>📧 datnfpolysd45@gmail.com | 📞 1900 1234</p>
+            <p>🏢 123 Đường ABC, Quận 1, TP.HCM</p>
+            <p style="margin-top: 20px; font-size: 12px; color: #9CA3AF;">
+                Email này được gửi tự động từ hệ thống. Vui lòng không trả lời trực tiếp.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

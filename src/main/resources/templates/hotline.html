@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: header-head}"></th:block>
+    <title>Hotline & Hỗ trợ khách hàng - Activewear Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+    <style>
+        /* Hotline Page Specific Styles */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            padding: var(--space-20) 0;
+            min-height: 420px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-16);
+            align-items: center;
+        }
+        
+        .hero-text h1 {
+            font-size: var(--text-5xl);
+            font-weight: 700;
+            margin-bottom: var(--space-4);
+            color: white;
+        }
+        
+        .hero-tagline {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-6);
+            opacity: 0.9;
+        }
+        
+        .hotline-display {
+            font-size: var(--text-6xl);
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: var(--space-8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-decoration: none;
+            display: inline-block;
+            transition: all var(--transition-normal);
+        }
+        
+        .hotline-display:hover {
+            color: #15803d;
+            transform: scale(1.05);
+            text-decoration: none;
+        }
+        
+        .hero-sla {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            margin-top: var(--space-4);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .hero-ctas {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+        
+        .hero-cta {
+            height: 48px;
+            padding: 0 var(--space-6);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            transition: all var(--transition-normal);
+        }
+        
+        .hero-cta-primary {
+            background: var(--success);
+            color: white;
+            border: none;
+        }
+        
+        .hero-cta-primary:hover {
+            background: #15803d;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .hero-cta-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .hero-cta-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .hero-illustration {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-illustration svg {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            opacity: 0.8;
+        }
+        
+        /* Contact Cards */
+        .contact-cards {
+            padding: var(--space-20) 0;
+        }
+        
+        .contact-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            height: 100%;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-soft);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .contact-card:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: var(--space-5);
+        }
+        
+        .contact-card h5 {
+            font-size: var(--text-base);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+        
+        .contact-card p {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+        }
+        
+        .contact-card .btn {
+            width: 100%;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: var(--text-sm);
+        }
+        
+        /* Icon Gradients */
+        .icon-phone { background: linear-gradient(45deg, var(--success), #20c997); }
+        .icon-email { background: linear-gradient(45deg, var(--info), #3b82f6); }
+        .icon-chat { background: linear-gradient(45deg, var(--primary), var(--primary-hover)); }
+        .icon-tracking { background: linear-gradient(45deg, var(--warning), #f59e0b); }
+        .icon-address { background: linear-gradient(45deg, var(--danger), #ef4444); }
+        .icon-hours { background: linear-gradient(45deg, #8b5cf6, #a855f7); }
+        
+        /* Form Section */
+        .form-section {
+            background: var(--bg-page);
+            padding: var(--space-20) 0;
+        }
+        
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--space-10);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .form-control, .form-select {
+            height: 48px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            font-size: var(--text-base);
+            padding: var(--space-3) var(--space-4);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(63, 106, 216, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .form-text {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+        }
+        
+        .btn-submit {
+            background: var(--primary);
+            border: none;
+            color: white;
+            height: 48px;
+            padding: 0 var(--space-8);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: var(--text-base);
+            transition: all var(--transition-normal);
+        }
+        
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            padding: var(--space-20) 0;
+        }
+        
+        .accordion-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-3);
+        }
+        
+        .accordion-button {
+            font-weight: 600;
+            font-size: var(--text-base);
+            color: var(--text-primary);
+            background: var(--bg-surface);
+            border: none;
+            padding: var(--space-4);
+            min-height: 56px;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .accordion-button:focus {
+            box-shadow: 0 0 0 0.2rem rgba(63, 106, 216, 0.25);
+        }
+        
+        .accordion-body {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            padding: var(--space-3) var(--space-4);
+        }
+        
+        /* Sticky CTA Bar (Mobile) */
+        .sticky-cta {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            display: none;
+            z-index: var(--z-sticky);
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .sticky-cta .btn {
+            height: 100%;
+            border-radius: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1199px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-illustration {
+                order: -1;
+            }
+            
+            .hero-illustration svg {
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .hero-section {
+                padding: var(--space-16) 0;
+                min-height: 360px;
+            }
+            
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+            }
+            
+            .hotline-display {
+                font-size: var(--text-5xl);
+            }
+            
+            .hero-cta {
+                height: 44px;
+                flex: 1;
+                min-width: 140px;
+            }
+            
+            .hero-ctas {
+                flex-direction: column;
+                gap: var(--space-2);
+            }
+            
+            .contact-cards .row > div {
+                margin-bottom: var(--space-4);
+            }
+            
+            .form-container {
+                padding: var(--space-6);
+            }
+            
+            .btn-submit {
+                width: 100%;
+            }
+            
+            .sticky-cta {
+                display: flex;
+            }
+            
+            .sticky-cta .btn {
+                font-size: var(--text-sm);
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .contact-cards .row > div:nth-child(odd) {
+                margin-bottom: var(--space-4);
+            }
+        }
+        
+        /* Section Spacing */
+        .section-spacing {
+            margin-bottom: var(--space-20);
+        }
+        
+        @media (max-width: 767px) {
+            .section-spacing {
+                margin-bottom: var(--space-10);
+            }
+        }
+        
+        /* Toast Styles */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: var(--z-toast);
+        }
+        
+        .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .toast-header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .toast-body {
+            color: var(--text-primary);
+        }
+        
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 20px;
+            width: 2px;
+            height: 30px;
+            background: #E6E8EF;
+        }
+        
+        .timeline-item.completed:not(:last-child)::before {
+            background: var(--success);
+        }
+        
+        .timeline-icon {
+            position: absolute;
+            left: -30px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #E6E8EF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #6B7280;
+        }
+        
+        .timeline-item.completed .timeline-icon {
+            background: var(--success);
+            color: white;
+        }
+        
+        .timeline-item.current .timeline-icon {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-text {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+        
+        .timeline-item.completed .timeline-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .timeline-item.current .timeline-text {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <!-- Header with Mega Menu -->
+    <th:block th:replace="~{fragments/header :: promo-bar}"></th:block>
+    <th:block th:replace="~{fragments/header :: header}"></th:block>
+    <th:block th:replace="~{fragments/header :: mobile-menu}"></th:block>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Hotline & Hỗ trợ khách hàng</h1>
+                    <p class="hero-tagline">Chúng tôi luôn sẵn sàng lắng nghe và trợ giúp bạn</p>
+                    <a href="tel:19001234" class="hotline-display" aria-label="Gọi hotline 1900 1234">1900 1234</a>
+                    <div class="hero-ctas">
+                        <a href="tel:19001234" class="hero-cta hero-cta-primary" aria-label="Gọi hotline 1900 1234">
+                            <i class="fas fa-phone"></i>
+                            Gọi ngay
+                        </a>
+                        <button type="button" class="hero-cta hero-cta-secondary" onclick="openChat()" aria-label="Mở chat hỗ trợ">
+                            <i class="fas fa-comments"></i>
+                            Chat ngay
+                        </button>
+                    </div>
+                    <p class="hero-sla">
+                        <i class="fas fa-clock me-2"></i>
+                        Phản hồi trong 15-30 phút (giờ làm việc)
+                    </p>
+                </div>
+                <div class="hero-illustration">
+                    <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="150" r="120" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                        <circle cx="200" cy="150" r="80" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                        <circle cx="200" cy="150" r="40" fill="rgba(255,255,255,0.2)"/>
+                        <path d="M180 130 L200 150 L220 130" stroke="rgba(255,255,255,0.8)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Cards -->
+    <section class="contact-cards">
+        <div class="container">
+            <h2 class="text-center section-title">Các kênh liên hệ</h2>
+            
+            <div class="row g-4">
+                <!-- Phone Card -->
+                <div class="col-lg-4 col-md-6">
+                    <a href="tel:19001234" class="contact-card" aria-label="Gọi điện thoại hỗ trợ">
+                        <div class="contact-icon icon-phone">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h5>Điện thoại</h5>
+                        <p>Gọi ngay để được hỗ trợ</p>
+                        <div class="btn btn-success">Gọi</div>
+                    </a>
+                </div>
+                
+                <!-- Email Card -->
+                <div class="col-lg-4 col-md-6">
+                    <a href="mailto:datnfpolysd45@gmail.com" class="contact-card" aria-label="Gửi email hỗ trợ">
+                        <div class="contact-icon icon-email">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h5>Email</h5>
+                        <p>Gửi email cho chúng tôi</p>
+                        <div class="btn btn-info">Gửi email</div>
+                    </a>
+                </div>
+                
+                <!-- Chat Card -->
+                <div class="col-lg-4 col-md-6">
+                    <button type="button" class="contact-card" onclick="openChat()" aria-label="Mở chat hỗ trợ">
+                        <div class="contact-icon icon-chat">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h5>Chat trực tiếp</h5>
+                        <p>Chat trực tiếp với CSKH</p>
+                        <div class="btn btn-primary">Mở chat</div>
+                    </button>
+                </div>
+                
+                <!-- Order Tracking Card -->
+                <div class="col-lg-4 col-md-6">
+                    <button type="button" class="contact-card" onclick="openTrackingModal()" aria-label="Tra cứu đơn hàng">
+                        <div class="contact-icon icon-tracking">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <h5>Theo dõi đơn hàng</h5>
+                        <p>Tra cứu tình trạng đơn hàng</p>
+                        <div class="btn btn-warning">Tra cứu</div>
+                    </button>
+                </div>
+                
+                <!-- Address Card -->
+                <div class="col-lg-4 col-md-6">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=123+Đường+ABC,+Quận+1,+TP.HCM" 
+                       target="_blank" class="contact-card" aria-label="Xem địa chỉ và chỉ đường">
+                        <div class="contact-icon icon-address">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h5>Địa chỉ</h5>
+                        <p>123 Đường ABC, Quận 1, TP.HCM</p>
+                        <div class="btn btn-danger">Chỉ đường</div>
+                    </a>
+                </div>
+                
+                <!-- Working Hours Card -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="contact-card">
+                        <div class="contact-icon icon-hours">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h5>Giờ làm việc</h5>
+                        <div class="working-hours">
+                            <p class="mb-1"><strong>T2-T6:</strong> 8:00-22:00</p>
+                            <p class="mb-1"><strong>T7-CN:</strong> 10:00-18:00</p>
+                            <p class="mb-0"><strong>Lễ tết:</strong> Theo thông báo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-container">
+                <h2 class="text-center section-title">Gửi tin nhắn cho chúng tôi</h2>
+                
+                <form id="contactForm" th:action="@{/hotline/contact}" method="post" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="+84...">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="subject" class="form-label">Chủ đề</label>
+                            <select class="form-select" id="subject" name="subject">
+                                <option value="">Chọn chủ đề</option>
+                                <option value="order_support">Hỗ trợ đơn hàng</option>
+                                <option value="complaint">Khiếu nại</option>
+                                <option value="product">Sản phẩm</option>
+                                <option value="partnership">Đối tác</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="department" class="form-label">Bộ phận</label>
+                            <select class="form-select" id="department" name="department">
+                                <option value="customer_service">Dịch vụ khách hàng (CSKH)</option>
+                                <option value="technical_support">Hỗ trợ kỹ thuật</option>
+                                <option value="sales">Bán hàng</option>
+                                <option value="accounting">Kế toán</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="attachment" class="form-label">Đính kèm (tùy chọn)</label>
+                            <input type="file" class="form-control" id="attachment" name="attachment" 
+                                   accept="image/*,.pdf" max="5242880">
+                            <div class="form-text">Chỉ chấp nhận file ảnh và PDF, tối đa 5MB</div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="message" class="form-label">Nội dung <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="message" name="message" rows="5" 
+                                      placeholder="Mô tả chi tiết vấn đề của bạn..." required></textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
+                                <label class="form-check-label" for="privacy">
+                                    Tôi đồng ý với <a href="/privacy" target="_blank">chính sách bảo mật</a> <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-submit" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Gửi tin nhắn
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted small">
+                        <i class="fas fa-clock me-2"></i>
+                        Chúng tôi sẽ trả lời trong 15-30 phút trong giờ làm việc
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="text-center section-title">Câu hỏi thường gặp</h2>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Làm thế nào để đặt hàng?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Bạn có thể đặt hàng trực tuyến trên website hoặc gọi hotline 1900 1234. 
+                                    Chọn sản phẩm, thêm vào giỏ hàng, điền thông tin giao hàng và thanh toán.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Thời gian giao hàng bao lâu?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Thời gian giao hàng từ 1-3 ngày làm việc trong nội thành, 
+                                    3-7 ngày làm việc cho các tỉnh thành khác. Miễn phí ship cho đơn hàng từ 500.000đ.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Chính sách đổi trả như thế nào?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Chúng tôi hỗ trợ đổi trả trong vòng 7 ngày kể từ ngày nhận hàng. 
+                                    Sản phẩm phải còn nguyên vẹn, chưa sử dụng và có hóa đơn mua hàng.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Bảo hành sản phẩm?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Tất cả sản phẩm chính hãng đều có bảo hành từ 6-24 tháng tùy theo nhà sản xuất. 
+                                    Bảo hành theo chính sách của từng thương hiệu.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    Phương thức thanh toán hỗ trợ?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Chúng tôi hỗ trợ thanh toán bằng thẻ tín dụng, chuyển khoản ngân hàng, 
+                                    ví điện tử (MoMo, ZaloPay) và thanh toán khi nhận hàng (COD).
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                    Cước phí & phạm vi giao hàng?
+                                </button>
+                            </h2>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Miễn phí ship cho đơn hàng từ 500.000đ. Phí ship 30.000đ cho đơn hàng dưới 500.000đ. 
+                                    Giao hàng toàn quốc, trừ một số vùng đặc biệt.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                    Tôi cần hỗ trợ gấp thì làm gì?
+                                </button>
+                            </h2>
+                            <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Gọi ngay hotline 1900 1234 (T2-T6: 8:00-22:00, T7-CN: 10:00-18:00) 
+                                    hoặc sử dụng chat trực tiếp trên website để được hỗ trợ nhanh nhất.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                                    Làm sao để theo dõi đơn hàng?
+                                </button>
+                            </h2>
+                            <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Bạn có thể theo dõi đơn hàng bằng mã đơn hàng trên website, 
+                                    hoặc đăng nhập tài khoản để xem lịch sử đơn hàng chi tiết.
+                                    <br><br>
+                                    <a href="#" onclick="openTrackingModal(); return false;" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-search me-1"></i>Tra cứu ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="/faq" class="btn btn-outline-primary">Xem tất cả câu hỏi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sticky CTA Bar (Mobile) -->
+    <div class="sticky-cta" id="stickyCta">
+        <div class="row g-0 h-100">
+            <div class="col-6">
+                <a href="tel:19001234" class="btn btn-success h-100" aria-label="Gọi hotline">
+                    <i class="fas fa-phone"></i>
+                    <span class="d-none d-sm-inline">Gọi</span>
+                </a>
+            </div>
+            <div class="col-6">
+                <button type="button" class="btn btn-primary h-100" onclick="openChat()" aria-label="Mở chat">
+                    <i class="fas fa-comments"></i>
+                    <span class="d-none d-sm-inline">Chat</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Tracking Modal -->
+    <div class="modal fade" id="trackingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tra cứu đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="trackingForm">
+                        <div class="mb-3">
+                            <label for="orderCode" class="form-label">Mã đơn hàng <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="orderCode" placeholder="VD: ORD-2025-001" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactInfo" class="form-label">Email hoặc SĐT (tùy chọn)</label>
+                            <input type="text" class="form-control" id="contactInfo" placeholder="Để xác thực thông tin">
+                        </div>
+                    </form>
+                    
+                    <!-- Tracking Result -->
+                    <div id="trackingResult" class="mt-4" style="display: none;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="trackingEmpty" class="mt-4" style="display: none;">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Không tìm thấy mã này. Vui lòng kiểm tra lại hoặc liên hệ CSKH.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="trackOrder()" id="trackBtn">
+                        <span class="spinner-border spinner-border-sm me-2" style="display: none;"></span>
+                        Tra cứu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Activewear Store</h5>
+                    <p class="mb-0">Cửa hàng thời trang thể thao hàng đầu Việt Nam</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Activewear Store. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container">
+        <div id="toast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastBody"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/hotline.js}"></script>
+    
+    <!-- Tawk.to Chat Widget -->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {};
+        var Tawk_LoadStart = new Date();
+        (function(){
+            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+            s1.async=true;
+            s1.src='https://embed.tawk.to/PLACEHOLDER_PROPERTY_ID/PLACEHOLDER_WIDGET_ID';
+            s1.charset='UTF-8';
+            s1.setAttribute('crossorigin','*');
+            s0.parentNode.insertBefore(s1,s0);
+        })();
+
+        // Global chat function
+        window.openChat = function() {
+            if (window.Tawk_API && window.Tawk_API.maximize) {
+                window.Tawk_API.maximize();
+            } else if (window.chatOpen) {
+                window.chatOpen();
+            } else {
+                // Fallback: show contact info modal
+                showContactFallback();
+            }
+        };
+
+        // Fallback contact modal
+        function showContactFallback() {
+            const modal = new bootstrap.Modal(document.getElementById('contactFallbackModal'));
+            modal.show();
+        }
+    </script>
+    
+    <style>
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            min-width: 200px;
+            z-index: var(--z-dropdown);
+            margin-top: var(--space-2);
+        }
+        
+        .user-dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: background-color var(--transition-fast);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: var(--text-sm);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--border);
+            margin: var(--space-2) 0;
+        }
+        
+        .admin-link {
+            color: var(--warning) !important;
+            font-weight: 600;
+        }
+        
+        .staff-link {
+            color: var(--info) !important;
+            font-weight: 600;
+        }
+    </style>
+    
+    <!-- Header Scripts -->
+    <th:block th:replace="~{fragments/header :: header-scripts}"></th:block>
+</body>
+</html>

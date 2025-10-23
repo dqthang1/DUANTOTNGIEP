@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: header-head}"></th:block>
+    <title>Sản phẩm yêu thích - Activewear Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+    <style>
+        /* Design Tokens từ main.css */
+        :root {
+            --primary: #3F6AD8;
+            --primary-light: #5A7FE8;
+            --primary-dark: #2E5BC7;
+            --secondary: #6C757D;
+            --success: #28A745;
+            --danger: #DC3545;
+            --warning: #FFC107;
+            --info: #17A2B8;
+            --light: #F8F9FA;
+            --dark: #343A40;
+            --white: #FFFFFF;
+            --gray-100: #F2F4F8;
+            --gray-200: #E6E8EF;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            
+            --border: #E6E8EF;
+            --border-light: #F2F4F8;
+            --bg-surface: #FFFFFF;
+            --bg-subtle: #F8F9FA;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            
+            --transition: all 0.2s ease-in-out;
+            --transition-slow: all 0.3s ease-in-out;
+        }
+
+        /* Container & Layout */
+        .container-custom {
+            max-width: 1280px;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        /* Header */
+        .favorites-header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 48px 0;
+        }
+
+        .favorites-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .favorites-counter {
+            display: inline-flex;
+            align-items: center;
+            background: var(--gray-100);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-left: 16px;
+        }
+
+        /* Toolbar */
+        .favorites-toolbar {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toolbar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bulk-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+        }
+
+        .bulk-actions.hidden {
+            display: none;
+        }
+
+        .bulk-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .btn-bulk {
+            height: 40px;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius);
+        }
+
+        .btn-toolbar {
+            height: 40px;
+            padding: 0 16px;
+            font-size: 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .btn-toolbar:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
+        }
+
+        .select-toolbar {
+            height: 40px;
+            padding: 0 12px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+        }
+
+        /* Product Grid */
+        .favorites-grid {
+            padding: 48px 0;
+        }
+
+        .product-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: var(--transition-slow);
+            height: 100%;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .product-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(63, 106, 216, 0.1);
+        }
+
+        .product-checkbox {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 10;
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+        }
+
+        .product-image {
+            aspect-ratio: 1;
+            background: var(--bg-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .product-badge {
+            padding: 4px 8px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-sale {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .badge-new {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .badge-out-of-stock {
+            background: var(--gray-500);
+            color: var(--white);
+        }
+
+        .product-actions {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-actions {
+            opacity: 1;
+        }
+
+        .btn-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: var(--white);
+            color: var(--text-primary);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-favorite {
+            color: var(--danger);
+        }
+
+        .btn-favorite.active {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-brand {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            min-height: 44px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price-container {
+            margin-bottom: 16px;
+            min-height: 40px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .product-price-old {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+            margin-right: 8px;
+        }
+
+        .price-drop-pill {
+            display: inline-block;
+            background: var(--danger);
+            color: var(--white);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius);
+            margin-left: 8px;
+        }
+
+        .product-stock {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .stock-available {
+            color: var(--success);
+        }
+
+        .stock-low {
+            color: var(--warning);
+        }
+
+        .stock-out {
+            color: var(--danger);
+        }
+
+        .product-cta {
+            width: 100%;
+            height: 44px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-add-to-cart {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-add-to-cart:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-add-to-cart:disabled {
+            background: var(--gray-300);
+            color: var(--gray-500);
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-favorites {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            color: var(--gray-300);
+            margin-bottom: 24px;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .empty-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background: var(--bg-subtle);
+            padding: 64px 0;
+            margin-top: 48px;
+        }
+
+        .recommendations-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        /* Mobile Sticky Bar */
+        .mobile-sticky-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 16px 24px;
+            display: none;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-sticky-bar.show {
+            display: block;
+        }
+
+        .mobile-sticky-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .mobile-selected-count {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mobile-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-mobile {
+            height: 44px;
+            padding: 0 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container-custom {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .favorites-title {
+                font-size: 32px;
+            }
+
+            .favorites-header {
+                padding: 32px 0;
+            }
+
+            .favorites-grid {
+                padding: 32px 0;
+            }
+
+            .toolbar-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .toolbar-left,
+            .toolbar-right {
+                justify-content: space-between;
+            }
+
+            .bulk-actions {
+                order: -1;
+                justify-content: center;
+            }
+        }
+
+        /* Quick Pick Modal */
+        .quick-pick-modal .modal-dialog {
+            max-width: 560px;
+        }
+
+        .variant-options {
+            margin-bottom: 24px;
+        }
+
+        .variant-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .variant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .variant-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .variant-option:hover {
+            border-color: var(--primary);
+        }
+
+        .variant-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .variant-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-card {
+            height: 400px;
+            border-radius: var(--radius-lg);
+        }
+
+        .skeleton-image {
+            height: 260px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .skeleton-content {
+            padding: 20px;
+        }
+
+        .skeleton-line {
+            height: 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+        }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        .skeleton-line.medium {
+            width: 80%;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast-header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toast-body {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body th:data-user-logged-in="${user != null}">
+    <!-- Navigation -->
+    <!-- Header with Mega Menu -->
+    <th:block th:replace="~{fragments/header :: promo-bar}"></th:block>
+    <th:block th:replace="~{fragments/header :: header}"></th:block>
+    <th:block th:replace="~{fragments/header :: mobile-menu}"></th:block>
+
+    <!-- Breadcrumb -->
+    <div class="container-custom">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Sản phẩm yêu thích</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Header -->
+    <div class="favorites-header">
+        <div class="container-custom">
+            <h1 class="favorites-title">
+                Sản phẩm yêu thích
+                <span class="favorites-counter" th:if="${favoritesCount > 0}" th:text="'(' + ${favoritesCount} + ' sản phẩm)'">(0 sản phẩm)</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="favorites-toolbar" th:if="${favorites != null and !favorites.empty}">
+        <div class="container-custom">
+            <div class="toolbar-row">
+                <div class="toolbar-left">
+                    <div class="bulk-actions hidden" id="bulkActions">
+                        <input type="checkbox" id="selectAll" class="form-check-input">
+                        <label for="selectAll" class="form-check-label">Chọn tất cả</label>
+                        <span class="bulk-count" id="bulkCount">(0)</span>
+                        <button class="btn btn-bulk btn-outline-primary" id="bulkAddToCart" disabled>
+                            <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                        </button>
+                        <button class="btn btn-bulk btn-outline-danger" id="bulkRemove" disabled>
+                            <i class="fas fa-trash me-1"></i>Xóa
+                        </button>
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <select class="select-toolbar" id="sortSelect">
+                        <option value="newest">Mới nhất</option>
+                        <option value="price-asc">Giá tăng dần</option>
+                        <option value="price-desc">Giá giảm dần</option>
+                        <option value="discount">Ưu đãi nhiều</option>
+                    </select>
+                    <button class="btn btn-toolbar" id="filterBtn">
+                        <i class="fas fa-filter me-1"></i>Lọc
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-custom">
+        <!-- Loading State -->
+        <div class="favorites-grid" id="loadingState" style="display: none;">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="i : ${#numbers.sequence(1, 8)}">
+                    <div class="skeleton skeleton-card">
+                        <div class="skeleton skeleton-image"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton skeleton-line short"></div>
+                            <div class="skeleton skeleton-line medium"></div>
+                            <div class="skeleton skeleton-line short"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Grid -->
+        <div class="favorites-grid" id="favoritesGrid" th:if="${favorites != null and !favorites.empty}">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="favorite : ${favorites}">
+                    <div class="product-card" th:data-product-id="${favorite.sanPham.id}">
+                        <input type="checkbox" class="product-checkbox" th:data-product-id="${favorite.sanPham.id}">
+                        
+                        <div class="product-image">
+                            <img th:src="${favorite.sanPham.anhChinh}" 
+                                 th:alt="|${favorite.sanPham.ten} - ${favorite.sanPham.danhMuc.ten} - Activewear Store|" 
+                                 onerror="this.src='/images/products/placeholder.svg'">
+                            
+                            <div class="product-badges">
+                                <span class="product-badge badge-sale" th:if="${favorite.sanPham.giaGoc > favorite.sanPham.gia}">
+                                    -<span th:text="${#numbers.formatDecimal((favorite.sanPham.giaGoc - favorite.sanPham.gia) / favorite.sanPham.giaGoc * 100, 0, 'COMMA', 0, 'POINT')}">0</span>%
+                                </span>
+                                <span class="product-badge badge-out-of-stock" th:if="${favorite.sanPham.soLuongTon <= 0}">
+                                    Hết hàng
+                                </span>
+                            </div>
+                            
+                            <div class="product-actions">
+                                <button class="btn-action btn-favorite active" 
+                                        th:onclick="'toggleFavorite(' + ${favorite.sanPham.id} + ')'"
+                                        title="Bỏ khỏi yêu thích">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-info">
+                            <div class="product-brand" th:text="${favorite.sanPham.danhMuc.ten}">Brand</div>
+                            <h5 class="product-title" th:text="${favorite.sanPham.ten}">Tên sản phẩm</h5>
+                            
+                            <div class="product-price-container">
+                                <div class="product-price">
+                                    <span class="product-price-old" th:if="${favorite.sanPham.giaGoc > favorite.sanPham.gia}" 
+                                         th:text="${#numbers.formatDecimal(favorite.sanPham.giaGoc, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                                    <span th:text="${#numbers.formatDecimal(favorite.sanPham.gia, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                                    <span class="price-drop-pill" th:if="${favorite.sanPham.giaGoc > favorite.sanPham.gia}">
+                                        Giá đã giảm -<span th:text="${#numbers.formatDecimal((favorite.sanPham.giaGoc - favorite.sanPham.gia) / favorite.sanPham.giaGoc * 100, 0, 'COMMA', 0, 'POINT')}">0</span>%
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="product-stock">
+                                <span class="stock-available" th:if="${favorite.sanPham.soLuongTon > 10}">
+                                    <i class="fas fa-check-circle me-1"></i>Còn hàng
+                                </span>
+                                <span class="stock-low" th:if="${favorite.sanPham.soLuongTon > 0 and favorite.sanPham.soLuongTon <= 10}">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Ít hàng (<span th:text="${favorite.sanPham.soLuongTon}">0</span>)
+                                </span>
+                                <span class="stock-out" th:if="${favorite.sanPham.soLuongTon <= 0}">
+                                    <i class="fas fa-times-circle me-1"></i>Hết hàng
+                                </span>
+                            </div>
+                            
+                            <button class="product-cta btn-add-to-cart" 
+                                    th:onclick="'addToCart(' + ${favorite.sanPham.id} + ')'"
+                                    th:disabled="${favorite.sanPham.soLuongTon <= 0}"
+                                    th:title="${favorite.sanPham.soLuongTon <= 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}">
+                                <i class="fas fa-cart-plus me-1"></i>
+                                <span th:text="${favorite.sanPham.soLuongTon <= 0 ? 'Hết hàng' : 'Thêm vào giỏ'}">Thêm vào giỏ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-favorites" th:if="${favorites == null or favorites.empty}">
+            <div class="empty-icon">💙</div>
+            <h3 class="empty-title">Chưa có sản phẩm yêu thích</h3>
+            <p class="empty-description">Hãy khám phá các sản phẩm và thêm vào danh sách yêu thích của bạn</p>
+            <a href="/products" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag me-2"></i>Khám phá ngay
+            </a>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations" th:if="${favorites != null and !favorites.empty}">
+            <div class="container-custom">
+                <h2 class="recommendations-title">Có thể bạn sẽ thích</h2>
+                <div class="row" id="recommendationsGrid">
+                    <!-- Recommendations will be loaded via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Sticky Bar -->
+    <div class="mobile-sticky-bar" id="mobileStickyBar">
+        <div class="mobile-sticky-content">
+            <div class="mobile-selected-count" id="mobileSelectedCount">Đã chọn 0 sản phẩm</div>
+            <div class="mobile-actions">
+                <button class="btn btn-mobile btn-outline-primary" id="mobileAddToCart" disabled>
+                    <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                </button>
+                <button class="btn btn-mobile btn-outline-danger" id="mobileRemove" disabled>
+                    <i class="fas fa-trash me-1"></i>Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Pick Modal -->
+    <div class="modal fade quick-pick-modal" id="quickPickModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chọn biến thể sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="variant-options" id="sizeOptions">
+                        <div class="variant-label">Kích thước</div>
+                        <div class="variant-grid" id="sizeGrid">
+                            <!-- Size options will be populated -->
+                        </div>
+                    </div>
+                    <div class="variant-options" id="colorOptions">
+                        <div class="variant-label">Màu sắc</div>
+                        <div class="variant-grid" id="colorGrid">
+                            <!-- Color options will be populated -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Số lượng</label>
+                        <input type="number" class="form-control" id="quantity" value="1" min="1" max="10">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddToCart">
+                        <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Activewear Store</h5>
+                    <p>Cửa hàng trang phục thể thao hàng đầu Việt Nam</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h5>Liên hệ</h5>
+                    <p>
+                        <i class="fas fa-envelope me-2"></i>datnfpolysd45@gmail.com<br>
+                        <i class="fas fa-phone me-2"></i>0123 456 789
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2024 Activewear Store. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class FavoritesPage {
+            constructor() {
+                this.selectedProducts = new Set();
+                this.currentProduct = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadRecommendations();
+                this.setupGuestWishlist();
+            }
+
+            setupEventListeners() {
+                // Bulk actions
+                document.getElementById('selectAll')?.addEventListener('change', (e) => {
+                    this.toggleSelectAll(e.target.checked);
+                });
+
+                document.getElementById('bulkAddToCart')?.addEventListener('click', () => {
+                    this.bulkAddToCart();
+                });
+
+                document.getElementById('bulkRemove')?.addEventListener('click', () => {
+                    this.bulkRemove();
+                });
+
+                // Mobile sticky bar
+                document.getElementById('mobileAddToCart')?.addEventListener('click', () => {
+                    this.bulkAddToCart();
+                });
+
+                document.getElementById('mobileRemove')?.addEventListener('click', () => {
+                    this.bulkRemove();
+                });
+
+                // Sort
+                document.getElementById('sortSelect')?.addEventListener('change', (e) => {
+                    this.sortProducts(e.target.value);
+                });
+
+                // Quick pick modal
+                document.getElementById('confirmAddToCart')?.addEventListener('click', () => {
+                    this.confirmAddToCart();
+                });
+
+                // Product checkboxes
+                document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        this.toggleProductSelection(e.target);
+                    });
+                });
+            }
+
+            setupGuestWishlist() {
+                // Check if user is not logged in and sync localStorage
+                // Use data attribute from server-side to determine login status
+                const isLoggedIn = document.body.getAttribute('data-user-logged-in') === 'true';
+                
+                if (!isLoggedIn) {
+                    this.syncGuestWishlist();
+                }
+            }
+
+            syncGuestWishlist() {
+                const guestWishlist = JSON.parse(localStorage.getItem('guestWishlist') || '[]');
+                // Show banner to encourage login
+                this.showLoginBanner();
+            }
+
+            showLoginBanner() {
+                const banner = document.createElement('div');
+                banner.className = 'alert alert-info alert-dismissible fade show';
+                banner.innerHTML = `
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Đăng nhập để đồng bộ trên mọi thiết bị</strong>
+                    <p class="mb-0 mt-2">Danh sách yêu thích của bạn sẽ được lưu trữ an toàn và đồng bộ trên tất cả thiết bị.</p>
+                    <button type="button" class="btn btn-primary btn-sm mt-2" onclick="window.location.href='/login'">
+                        Đăng nhập ngay
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.favorites-header').after(banner);
+            }
+
+            toggleSelectAll(checked) {
+                const checkboxes = document.querySelectorAll('.product-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = checked;
+                    this.toggleProductSelection(checkbox);
+                });
+            }
+
+            toggleProductSelection(checkbox) {
+                const productId = checkbox.dataset.productId;
+                const productCard = checkbox.closest('.product-card');
+                
+                if (checkbox.checked) {
+                    this.selectedProducts.add(productId);
+                    productCard.classList.add('selected');
+                } else {
+                    this.selectedProducts.delete(productId);
+                    productCard.classList.remove('selected');
+                }
+
+                this.updateBulkActions();
+                this.updateMobileStickyBar();
+            }
+
+            updateBulkActions() {
+                const count = this.selectedProducts.size;
+                const bulkActions = document.getElementById('bulkActions');
+                const bulkCount = document.getElementById('bulkCount');
+                const bulkAddToCart = document.getElementById('bulkAddToCart');
+                const bulkRemove = document.getElementById('bulkRemove');
+
+                if (count > 0) {
+                    bulkActions.classList.remove('hidden');
+                    bulkCount.textContent = `(${count})`;
+                    bulkAddToCart.disabled = false;
+                    bulkAddToCart.innerHTML = `<i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ (${count})`;
+                    bulkRemove.disabled = false;
+                    bulkRemove.innerHTML = `<i class="fas fa-trash me-1"></i>Xóa (${count})`;
+                } else {
+                    bulkActions.classList.add('hidden');
+                }
+            }
+
+            updateMobileStickyBar() {
+                const count = this.selectedProducts.size;
+                const mobileBar = document.getElementById('mobileStickyBar');
+                const mobileCount = document.getElementById('mobileSelectedCount');
+                const mobileAddToCart = document.getElementById('mobileAddToCart');
+                const mobileRemove = document.getElementById('mobileRemove');
+
+                if (count > 0) {
+                    mobileBar.classList.add('show');
+                    mobileCount.textContent = `Đã chọn ${count} sản phẩm`;
+                    mobileAddToCart.disabled = false;
+                    mobileRemove.disabled = false;
+                } else {
+                    mobileBar.classList.remove('show');
+                }
+            }
+
+            async bulkAddToCart() {
+                if (this.selectedProducts.size === 0) return;
+
+                const productIds = Array.from(this.selectedProducts);
+                const results = [];
+
+                for (const productId of productIds) {
+                    try {
+                        const result = await this.addToCart(productId);
+                        results.push({ productId, success: result.success });
+                    } catch (error) {
+                        results.push({ productId, success: false, error: error.message });
+                    }
+                }
+
+                const successCount = results.filter(r => r.success).length;
+                this.showToast(`Đã thêm ${successCount}/${productIds.length} sản phẩm vào giỏ hàng`, 'success');
+                
+                // Clear selection
+                this.selectedProducts.clear();
+                document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.product-card').forEach(card => card.classList.remove('selected'));
+                this.updateBulkActions();
+                this.updateMobileStickyBar();
+            }
+
+            async bulkRemove() {
+                if (this.selectedProducts.size === 0) return;
+
+                if (!confirm(`Bạn có chắc chắn muốn xóa ${this.selectedProducts.size} sản phẩm khỏi danh sách yêu thích?`)) {
+                    return;
+                }
+
+                const productIds = Array.from(this.selectedProducts);
+                const results = [];
+
+                for (const productId of productIds) {
+                    try {
+                        const result = await this.removeFromFavorites(productId);
+                        results.push({ productId, success: result.success });
+                    } catch (error) {
+                        results.push({ productId, success: false, error: error.message });
+                    }
+                }
+
+                const successCount = results.filter(r => r.success).length;
+                this.showToast(`Đã xóa ${successCount}/${productIds.length} sản phẩm khỏi yêu thích`, 'success');
+                
+                // Reload page to update the list
+                setTimeout(() => location.reload(), 1000);
+            }
+
+            async addToCart(productId) {
+                // Check if product requires variants
+                const requiresVariants = await this.checkProductVariants(productId);
+                
+                if (requiresVariants) {
+                    this.showQuickPickModal(productId);
+                    return { success: false, requiresVariants: true };
+                }
+
+                return await this.addToCartDirect(productId, 1);
+            }
+
+            async addToCartDirect(productId, quantity = 1) {
+                const response = await fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        productId: productId,
+                        quantity: quantity
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showToast('Đã thêm vào giỏ hàng', 'success');
+                } else {
+                    this.showToast(data.message || 'Có lỗi xảy ra', 'error');
+                }
+
+                return data;
+            }
+
+            async checkProductVariants(productId) {
+                // This would check if product has size/color variants
+                // For now, return false (no variants required)
+                return false;
+            }
+
+            showQuickPickModal(productId) {
+                this.currentProduct = productId;
+                const modal = new bootstrap.Modal(document.getElementById('quickPickModal'));
+                modal.show();
+            }
+
+            async confirmAddToCart() {
+                if (!this.currentProduct) return;
+
+                const quantity = parseInt(document.getElementById('quantity').value) || 1;
+                const result = await this.addToCartDirect(this.currentProduct, quantity);
+                
+                if (result.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('quickPickModal'));
+                    modal.hide();
+                }
+            }
+
+            async removeFromFavorites(productId) {
+                const response = await fetch(`/api/wishlist/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showToast('Đã xóa khỏi yêu thích', 'success');
+                } else {
+                    this.showToast(data.message || 'Có lỗi xảy ra', 'error');
+                }
+
+                return data;
+            }
+
+            async toggleFavorite(productId) {
+                const response = await fetch(`/favorites/api/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        productId: productId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.isFavorite) {
+                        this.showToast('Đã thêm vào yêu thích', 'success');
+                    } else {
+                        this.showToast('Đã xóa khỏi yêu thích', 'success');
+                        // Remove from current view
+                        const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+                        if (productCard) {
+                            productCard.remove();
+                        }
+                    }
+                } else {
+                    this.showToast(data.message || 'Có lỗi xảy ra', 'error');
+                }
+
+                return data;
+            }
+
+            sortProducts(sortBy) {
+                const grid = document.getElementById('favoritesGrid');
+                const products = Array.from(grid.querySelectorAll('.product-card'));
+                
+                products.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'price-asc':
+                            return this.getProductPrice(a) - this.getProductPrice(b);
+                        case 'price-desc':
+                            return this.getProductPrice(b) - this.getProductPrice(a);
+                        case 'discount':
+                            return this.getProductDiscount(b) - this.getProductDiscount(a);
+                        default: // newest
+                            return 0; // Keep original order
+                    }
+                });
+
+                // Re-append sorted products
+                const row = grid.querySelector('.row');
+                products.forEach(product => row.appendChild(product));
+            }
+
+            getProductPrice(productCard) {
+                const priceText = productCard.querySelector('.product-price span:last-child').textContent;
+                return parseInt(priceText.replace(/[^\d]/g, '')) || 0;
+            }
+
+            getProductDiscount(productCard) {
+                const discountBadge = productCard.querySelector('.badge-sale');
+                if (!discountBadge) return 0;
+                const discountText = discountBadge.textContent;
+                return parseInt(discountText.replace(/[^\d]/g, '')) || 0;
+            }
+
+            async loadRecommendations() {
+                try {
+                    const response = await fetch('/api/products/recommendations?limit=6');
+                    const data = await response.json();
+                    
+                    if (data.success && data.products) {
+                        this.renderRecommendations(data.products);
+                    }
+                } catch (error) {
+                    console.error('Error loading recommendations:', error);
+                }
+            }
+
+            renderRecommendations(products) {
+                const grid = document.getElementById('recommendationsGrid');
+                if (!grid) return;
+
+                grid.innerHTML = products.map(product => `
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="${product.anhChinh}" alt="${product.ten}" 
+                                     onerror="this.src='/images/products/placeholder.svg'">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-brand">${product.danhMuc?.ten || ''}</div>
+                                <h6 class="product-title">${product.ten}</h6>
+                                <div class="product-price">
+                                    <span>${new Intl.NumberFormat('vi-VN').format(product.gia)}đ</span>
+                                </div>
+                                <button class="product-cta btn-add-to-cart" onclick="favoritesPage.addToCart(${product.id})">
+                                    <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showToast(message, type = 'info') {
+                const toastContainer = document.getElementById('toastContainer');
+                const toastId = 'toast-' + Date.now();
+                
+                const toastHtml = `
+                    <div class="toast" id="${toastId}" role="alert">
+                        <div class="toast-header">
+                            <i class="fas fa-${type === 'success' ? 'check-circle text-success' : type === 'error' ? 'exclamation-circle text-danger' : 'info-circle text-info'} me-2"></i>
+                            <strong class="me-auto">Thông báo</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                    </div>
+                `;
+                
+                toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+                
+                const toastElement = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+                
+                // Remove toast element after it's hidden
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    toastElement.remove();
+                });
+            }
+        }
+
+        // Global functions for backward compatibility
+        function toggleFavorite(productId) {
+            favoritesPage.toggleFavorite(productId);
+        }
+
+        function addToCart(productId) {
+            favoritesPage.addToCart(productId);
+        }
+
+        function removeFromFavorites(productId) {
+            favoritesPage.removeFromFavorites(productId);
+        }
+
+        // Initialize the page
+        const favoritesPage = new FavoritesPage();
+    </script>
+    
+    <!-- Header Scripts -->
+    <th:block th:replace="~{fragments/header :: header-scripts}"></th:block>
+</body>
+</html>
