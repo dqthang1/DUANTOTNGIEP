@@ -1,0 +1,160 @@
+/* ============================================
+   PRODUCTS PAGE (PLP) STYLING
+   ============================================ */
+
+@import url('product-card.css');
+
+/* Toolbar Container */
+.plp-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #E5E7EB;
+    margin-bottom: 24px;
+}
+
+/* Left: Breadcrumb + Count */
+.plp-toolbar-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.plp-breadcrumb {
+    font-size: 13px;
+    color: #7A7D86;
+}
+
+.plp-breadcrumb a {
+    color: #7A7D86;
+    text-decoration: none;
+}
+
+.plp-breadcrumb a:hover {
+    color: #22252E;
+}
+
+.plp-results-count {
+    font-size: 14px;
+    color: #22252E;
+    font-weight: 500;
+}
+
+.plp-results-count strong {
+    font-weight: 600;
+}
+
+/* Right: Sort + Filter */
+.plp-toolbar-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.plp-sort-dropdown {
+    padding: 8px 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    min-width: 180px;
+}
+
+.plp-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.plp-filter-btn:hover {
+    background: #F6F7F9;
+}
+
+/* Quick Filters */
+.plp-quick-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.plp-filter-chip {
+    padding: 6px 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.plp-filter-chip.active {
+    background: #22252E;
+    color: white;
+    border-color: #22252E;
+}
+
+.plp-filter-chip-close {
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* Mobile Toolbar */
+@media (max-width: 767px) {
+    .plp-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .plp-toolbar-right {
+        width: 100%;
+    }
+    
+    .plp-sort-dropdown,
+    .plp-filter-btn {
+        flex: 1;
+    }
+}
+
+/* Pagination */
+.plp-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 48px;
+}
+
+.plp-pagination-btn {
+    padding: 8px 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 40px;
+    text-align: center;
+}
+
+.plp-pagination-btn.active {
+    background: #22252E;
+    color: white;
+    border-color: #22252E;
+}
+
+.plp-pagination-btn:hover:not(.active) {
+    background: #F6F7F9;
+}

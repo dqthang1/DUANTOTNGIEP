@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: header-head}"></th:block>
+    <title>Thanh toán - Activewear Store</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/checkout.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header with Mega Menu -->
+    <th:block th:replace="~{fragments/header :: promo-bar}"></th:block>
+    <th:block th:replace="~{fragments/header :: header}"></th:block>
+    <th:block th:replace="~{fragments/header :: mobile-menu}"></th:block>
+
+    <!-- Main Container -->
+    <div class="checkout-container">
+        <!-- Stepper Navigation -->
+        <div class="checkout-stepper">
+            <div class="stepper-item completed">
+                <div class="stepper-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stepper-label">Giỏ hàng</div>
+            </div>
+            <div class="stepper-line"></div>
+            <div class="stepper-item active">
+                <div class="stepper-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="stepper-label">Địa chỉ & Thanh toán</div>
+            </div>
+            <div class="stepper-line"></div>
+            <div class="stepper-item">
+                <div class="stepper-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stepper-label">Hoàn tất</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="checkout-content">
+            <!-- Left Column - Checkout Form -->
+            <div class="checkout-form">
+                <!-- Address Section -->
+                <div class="checkout-section">
+                    <div class="section-header">
+                        <h4><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng</h4>
+                    </div>
+                    <div class="section-content">
+                        <div id="address-list" class="address-list">
+                            <!-- Addresses will be loaded here -->
+                        </div>
+                        <button class="btn btn-outline-primary add-address-btn" id="add-address-btn">
+                            <i class="fas fa-plus me-2"></i>Thêm địa chỉ mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shipping Method Section -->
+                <div class="checkout-section" id="shipping-section" style="display: none;">
+                    <div class="section-header">
+                        <h4><i class="fas fa-truck me-2"></i>Phương thức vận chuyển</h4>
+                    </div>
+                    <div class="section-content">
+                        <div id="shipping-methods" class="shipping-methods">
+                            <!-- Shipping methods will be loaded here -->
+                        </div>
+                        <div class="shipping-note">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Miễn phí vận chuyển HN/HCM cho đơn từ 499.000đ
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Section -->
+                <div class="checkout-section">
+                    <div class="section-header">
+                        <h4><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán</h4>
+                    </div>
+                    <div class="section-content">
+                        <div class="payment-methods">
+                            <div class="payment-method-card" data-method="COD">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="payment-method-content">
+                                    <h6>Thanh toán khi nhận hàng (COD)</h6>
+                                    <p class="text-muted">Thanh toán bằng tiền mặt khi nhận hàng</p>
+                                </div>
+                                <div class="payment-method-radio">
+                                    <input type="radio" name="payment-method" value="COD" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method-card" data-method="BANK_TRANSFER">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="payment-method-content">
+                                    <h6>Chuyển khoản ngân hàng</h6>
+                                    <p class="text-muted">Chuyển khoản trực tiếp vào tài khoản ngân hàng</p>
+                                </div>
+                                <div class="payment-method-radio">
+                                    <input type="radio" name="payment-method" value="BANK_TRANSFER">
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method-card" data-method="VNPAY">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="payment-method-content">
+                                    <h6>Thanh toán VNPay</h6>
+                                    <p class="text-muted">An toàn, thanh toán 1 chạm</p>
+                                </div>
+                                <div class="payment-method-radio">
+                                    <input type="radio" name="payment-method" value="VNPAY">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voucher Section -->
+                <div class="checkout-section">
+                    <div class="section-header">
+                        <h4><i class="fas fa-ticket-alt me-2"></i>Mã giảm giá</h4>
+                    </div>
+                    <div class="section-content">
+                        <div class="voucher-input-group">
+                            <input type="text" class="form-control" id="voucher-code" placeholder="Nhập mã giảm giá">
+                            <button class="btn btn-outline-primary" id="apply-voucher-btn">Áp dụng</button>
+                        </div>
+                        <div id="applied-vouchers" class="applied-vouchers">
+                            <!-- Applied vouchers will be shown here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="checkout-section">
+                    <div class="section-header">
+                        <h4><i class="fas fa-sticky-note me-2"></i>Ghi chú đơn hàng</h4>
+                    </div>
+                    <div class="section-content">
+                        <textarea class="form-control" id="order-notes" rows="2" placeholder="Giao giờ hành chính, gọi trước 15 phút..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="checkout-summary">
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <h5><i class="fas fa-shopping-bag me-2"></i>Tóm tắt đơn hàng</h5>
+                    </div>
+                    <div class="summary-content">
+                        <div id="order-items" class="order-items">
+                            <!-- Order items will be loaded here -->
+                        </div>
+                        
+                        <div class="summary-breakdown">
+                            <div class="breakdown-row">
+                                <span>Tạm tính:</span>
+                                <span id="subtotal">0 ₫</span>
+                            </div>
+                            <div class="breakdown-row" id="discount-row" style="display: none;">
+                                <span>Giảm giá:</span>
+                                <span id="discount-amount" class="text-success">-0 ₫</span>
+                            </div>
+                            <div class="breakdown-row">
+                                <span>Phí vận chuyển:</span>
+                                <span id="shipping-fee">0 ₫</span>
+                            </div>
+                            <div class="breakdown-row total">
+                                <span>Tổng cộng:</span>
+                                <span id="total-amount">0 ₫</span>
+                            </div>
+                        </div>
+                        
+                        <div class="delivery-estimate" id="delivery-estimate" style="display: none;">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                Dự kiến giao: <span id="delivery-date"></span>
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-footer">
+                        <div class="terms-checkbox">
+                            <input type="checkbox" id="agree-terms" required>
+                            <label for="agree-terms">
+                                Tôi đồng ý với <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Điều khoản sử dụng</a> và <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Chính sách bảo mật</a>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100" id="place-order-btn">
+                            <span class="btn-text">Đặt hàng</span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Modal (Custom) -->
+    <div id="custom-address-modal" class="custom-modal" style="display: none;">
+        <!-- Modal content will be inserted by JavaScript -->
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Điều khoản sử dụng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Nội dung điều khoản sử dụng...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chính sách bảo mật</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Nội dung chính sách bảo mật...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/checkout.js?v=1732447000000"></script>
+    
+    <!-- Header Scripts -->
+    <th:block th:replace="~{fragments/header :: header-scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email Validation - Activewear Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .demo-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .demo-header {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+        }
+        .demo-body {
+            padding: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px 16px;
+            font-size: 16px;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+        }
+        .form-control.error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .form-control.success {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .test-emails {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .test-emails h6 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .test-email {
+            display: inline-block;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .test-email:hover {
+            background: #007bff;
+            color: white;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-checking {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        .status-exists {
+            background: #dc3545;
+        }
+        .status-available {
+            background: #28a745;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-card">
+            <div class="demo-header">
+                <h3><i class="fas fa-envelope me-2"></i>Test Email Validation</h3>
+                <p class="mb-0">Kiểm tra tính năng validation email real-time</p>
+            </div>
+            <div class="demo-body">
+                
+                <!-- Test Emails -->
+                <div class="test-emails">
+                    <h6><i class="fas fa-list me-2"></i>Test với các email có sẵn:</h6>
+                    <div class="test-email" onclick="setEmail('admin@datnfpolysd45.com')">admin@datnfpolysd45.com</div>
+                    <div class="test-email" onclick="setEmail('customer@example.com')">customer@example.com</div>
+                    <div class="test-email" onclick="setEmail('user@example.com')">user@example.com</div>
+                    <div class="test-email" onclick="setEmail('staff@datnfpolysd45.com')">staff@datnfpolysd45.com</div>
+                    <div class="test-email" onclick="setEmail('newuser@example.com')">newuser@example.com</div>
+                    <div class="test-email" onclick="setEmail('test@example.com')">test@example.com</div>
+                </div>
+
+                <!-- Email Input -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-1"></i>Email Address
+                        <span id="status-indicator" class="status-indicator" style="display: none;"></span>
+                    </label>
+                    <input type="email" 
+                           class="form-control" 
+                           id="email" 
+                           placeholder="Nhập email để kiểm tra..."
+                           autocomplete="off">
+                    <div id="email-message" class="error-message" style="display: none;"></div>
+                </div>
+
+                <!-- API Response -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-code me-1"></i>API Response:
+                    </label>
+                    <pre id="api-response" style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 14px; margin: 0;">Chưa có response...</pre>
+                </div>
+
+                <!-- Instructions -->
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Hướng dẫn test:</h6>
+                    <ol class="mb-0">
+                        <li>Nhập email hoặc click vào email test ở trên</li>
+                        <li>Hệ thống sẽ tự động kiểm tra email sau 500ms</li>
+                        <li>Email đã tồn tại sẽ hiển thị lỗi màu đỏ</li>
+                        <li>Email chưa tồn tại sẽ hiển thị thành công màu xanh</li>
+                        <li>Xem API response để hiểu chi tiết</li>
+                    </ol>
+                </div>
+
+                <!-- Back to App -->
+                <div class="text-center mt-4">
+                    <a href="http://localhost:8080/register" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>Mở trang đăng ký thực tế
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const emailInput = document.getElementById('email');
+        const statusIndicator = document.getElementById('status-indicator');
+        const emailMessage = document.getElementById('email-message');
+        const apiResponse = document.getElementById('api-response');
+        
+        let checkTimeout;
+
+        // Function to set email from test buttons
+        function setEmail(email) {
+            emailInput.value = email;
+            emailInput.dispatchEvent(new Event('input'));
+        }
+
+        // Email validation function
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Function to show status
+        function showStatus(type, message) {
+            statusIndicator.style.display = 'inline-block';
+            statusIndicator.className = `status-indicator status-${type}`;
+            emailMessage.textContent = message;
+            emailMessage.style.display = 'block';
+            emailMessage.className = `${type === 'exists' ? 'error' : 'success'}-message`;
+        }
+
+        // Function to clear status
+        function clearStatus() {
+            statusIndicator.style.display = 'none';
+            emailMessage.style.display = 'none';
+            emailInput.classList.remove('error', 'success');
+        }
+
+        // Function to check email
+        function checkEmail(email) {
+            if (!validateEmail(email)) {
+                clearStatus();
+                return;
+            }
+
+            // Show checking status
+            showStatus('checking', 'Đang kiểm tra...');
+            emailInput.classList.add('error');
+
+            // Make API call
+            fetch(`/api/check-email?email=${encodeURIComponent(email)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update API response display
+                    apiResponse.textContent = JSON.stringify(data, null, 2);
+                    
+                    if (data.exists) {
+                        showStatus('exists', data.message);
+                        emailInput.classList.remove('success');
+                        emailInput.classList.add('error');
+                    } else {
+                        showStatus('available', data.message);
+                        emailInput.classList.remove('error');
+                        emailInput.classList.add('success');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking email:', error);
+                    showStatus('exists', 'Lỗi kiểm tra email');
+                    emailInput.classList.add('error');
+                    apiResponse.textContent = `Error: ${error.message}`;
+                });
+        }
+
+        // Event listener for email input
+        emailInput.addEventListener('input', function() {
+            const email = this.value.trim();
+            
+            // Clear previous timeout
+            if (checkTimeout) {
+                clearTimeout(checkTimeout);
+            }
+            
+            // Clear previous status
+            clearStatus();
+            
+            if (email && validateEmail(email)) {
+                // Debounce the check
+                checkTimeout = setTimeout(() => {
+                    checkEmail(email);
+                }, 500);
+            }
+        });
+
+        // Event listener for blur
+        emailInput.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !validateEmail(email)) {
+                showStatus('exists', 'Email không hợp lệ');
+                emailInput.classList.add('error');
+            }
+        });
+
+        // Auto-focus on email input
+        emailInput.focus();
+    </script>
+</body>
+</html>

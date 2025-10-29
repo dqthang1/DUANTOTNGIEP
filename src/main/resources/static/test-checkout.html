@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Checkout Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Checkout Page</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Basic JavaScript</h3>
+        <button class="test-button" onclick="basicTest()">Basic Test</button>
+        <div id="basic-result" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2: Button Click</h3>
+        <button class="test-button" id="click-test">Click Test</button>
+        <div id="click-result" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 3: Modal Creation</h3>
+        <button class="test-button" id="modal-test">Create Modal</button>
+        <div id="modal-result" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 4: Checkout Button Simulation</h3>
+        <button class="test-button" data-bs-target="#addressModal" id="checkout-sim">Simulate Checkout Button</button>
+        <div id="checkout-result" class="log"></div>
+    </div>
+
+    <script>
+        // Test 1: Basic JavaScript
+        function basicTest() {
+            const result = document.getElementById('basic-result');
+            result.innerHTML = '✅ Basic JavaScript hoạt động bình thường!';
+            console.log('Basic test passed');
+        }
+
+        // Test 2: Button Click
+        document.getElementById('click-test').addEventListener('click', function() {
+            const result = document.getElementById('click-result');
+            result.innerHTML = '✅ Button click event hoạt động!';
+            console.log('Click test passed');
+        });
+
+        // Test 3: Modal Creation
+        document.getElementById('modal-test').addEventListener('click', function() {
+            const result = document.getElementById('modal-result');
+            result.innerHTML = '✅ Đang tạo modal...';
+            
+            // Create modal
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;">
+                    <h3>Test Modal</h3>
+                    <p>Modal được tạo thành công!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Đóng</button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            result.innerHTML = '✅ Modal đã được tạo và hiển thị!';
+            console.log('Modal test passed');
+        });
+
+        // Test 4: Checkout Button Simulation
+        document.getElementById('checkout-sim').addEventListener('click', function(e) {
+            e.preventDefault();
+            const result = document.getElementById('checkout-result');
+            result.innerHTML = '✅ Checkout button được click!';
+            console.log('Checkout button clicked');
+            
+            // Simulate the checkout modal creation
+            alert('Checkout button clicked! Tạo modal...');
+            createCheckoutModal();
+        });
+
+        function createCheckoutModal() {
+            const result = document.getElementById('checkout-result');
+            
+            // Remove existing modal
+            const existing = document.getElementById('checkout-modal');
+            if (existing) existing.remove();
+            
+            // Create modal
+            const overlay = document.createElement('div');
+            overlay.id = 'checkout-modal';
+            overlay.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(0,0,0,0.5) !important;
+                z-index: 99999 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 20px; max-width: 600px; width: 90%; border: 2px solid red; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h5 style="margin: 0; color: #333;">Thêm địa chỉ mới</h5>
+                        <button type="button" onclick="this.parentElement.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+                    </div>
+                    <div style="color: #333;">
+                        <p>Form thêm địa chỉ sẽ hiển thị ở đây...</p>
+                        <button type="button" onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; margin-right: 10px;">Hủy</button>
+                        <button type="button" onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Lưu địa chỉ</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            result.innerHTML = '✅ Checkout modal đã được tạo và hiển thị!';
+            console.log('Checkout modal created');
+        }
+
+        // Log page load
+        console.log('Test page loaded successfully');
+    </script>
+</body>
+</html>

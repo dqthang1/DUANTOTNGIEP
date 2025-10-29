@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tồn kho - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-low-stock {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .product-img-small {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .stat-card {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            transition: all 0.3s;
+        }
+        .quick-action-btn {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (same as other admin pages) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin">
+                <i class="fas fa-boxes me-2"></i>Quản lý Tồn kho
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin/product-management">
+                    <i class="fas fa-box me-1"></i>Sản phẩm
+                </a>
+                <a class="nav-link active" href="/admin/inventory">
+                    <i class="fas fa-warehouse me-1"></i>Tồn kho
+                </a>
+                <a class="nav-link" href="/admin/promotion-management">
+                    <i class="fas fa-gift me-1"></i>Khuyến mãi
+                </a>
+                <a class="nav-link" href="/admin">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>Trang chủ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Còn hàng</h6>
+                            <h3 class="mb-0" th:text="${inStockCount}">0</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Sắp hết hàng</h6>
+                            <h3 class="mb-0" th:text="${lowStockCount}">0</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-danger text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Hết hàng</h6>
+                            <h3 class="mb-0" th:text="${outOfStockCount}">0</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-times-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Actions -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="Tìm kiếm sản phẩm..." 
+                               th:value="${search}">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="IN_STOCK" th:selected="${status == 'IN_STOCK'}">Còn hàng</option>
+                            <option value="LOW_STOCK" th:selected="${status == 'LOW_STOCK'}">Sắp hết</option>
+                            <option value="OUT_OF_STOCK" th:selected="${status == 'OUT_OF_STOCK'}">Hết hàng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onclick="applyFilters()">
+                            <i class="fas fa-filter me-2"></i>Lọc
+                        </button>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button class="btn btn-success" onclick="showBulkUpdateModal()">
+                            <i class="fas fa-edit me-2"></i>Cập nhật hàng loạt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-warehouse me-2"></i>Danh sách tồn kho
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="10%">Hình ảnh</th>
+                                <th width="20%">Sản phẩm</th>
+                                <th width="10%">Mã SP</th>
+                                <th width="12%">Danh mục</th>
+                                <th width="12%">Thương hiệu</th>
+                                <th width="10%">Tồn kho</th>
+                                <th width="10%">Trạng thái</th>
+                                <th width="11%">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${inventory.isEmpty()}">
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                                    <p>Không có sản phẩm nào</p>
+                                </td>
+                            </tr>
+                            <tr th:each="item, iterStat : ${inventory.content}">
+                                <td th:text="${iterStat.count + (currentPage * 20)}">1</td>
+                                <td>
+                                    <img th:src="${item.imagePath ?: '/images/no-image.svg'}" 
+                                         th:alt="${item.productName}"
+                                         class="product-img-small">
+                                </td>
+                                <td>
+                                    <strong th:text="${item.productName}">Product Name</strong>
+                                    <div th:if="${item.variantsCount > 0}" class="text-muted small">
+                                        <i class="fas fa-layer-group me-1"></i>
+                                        <span th:text="${item.variantsCount}">0</span> biến thể
+                                    </div>
+                                </td>
+                                <td>
+                                    <code th:text="${item.productCode}">SKU</code>
+                                </td>
+                                <td th:text="${item.category ?: '-'}">Category</td>
+                                <td th:text="${item.brand ?: '-'}">Brand</td>
+                                <td>
+                                    <strong th:text="${item.currentStock}" class="fs-5">0</strong>
+                                    <div th:if="${item.totalVariantsStock != item.currentStock}" 
+                                         class="text-muted small">
+                                        Biến thể: <span th:text="${item.totalVariantsStock}">0</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:if="${item.status == 'IN_STOCK'}" 
+                                          class="status-badge status-in-stock">
+                                        <i class="fas fa-check-circle me-1"></i>Còn hàng
+                                    </span>
+                                    <span th:if="${item.status == 'LOW_STOCK'}" 
+                                          class="status-badge status-low-stock">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Sắp hết
+                                    </span>
+                                    <span th:if="${item.status == 'OUT_OF_STOCK'}" 
+                                          class="status-badge status-out-of-stock">
+                                        <i class="fas fa-times-circle me-1"></i>Hết hàng
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary quick-action-btn"
+                                            th:attr="data-id=${item.productId},data-name=${item.productName},data-stock=${item.currentStock}"
+                                            onclick="showUpdateModal(this.dataset.id, this.dataset.name, this.dataset.stock)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-info quick-action-btn" 
+                                            th:attr="data-id=${item.productId}"
+                                            onclick="showHistory(this.dataset.id)">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" 
+                               th:href="@{/admin/inventory(page=${currentPage - 1}, search=${search}, status=${status})}">
+                                Trước
+                            </a>
+                        </li>
+                        <li class="page-item" 
+                            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" 
+                               th:href="@{/admin/inventory(page=${i}, search=${search}, status=${status})}"
+                               th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" 
+                               th:href="@{/admin/inventory(page=${currentPage + 1}, search=${search}, status=${status})}">
+                                Sau
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Stock Modal -->
+    <div class="modal fade" id="updateStockModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Cập nhật tồn kho
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="updateProductId">
+                    <div class="mb-3">
+                        <label class="form-label">Sản phẩm:</label>
+                        <input type="text" class="form-control" id="updateProductName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tồn kho hiện tại:</label>
+                        <input type="number" class="form-control" id="updateCurrentStock" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại thay đổi:</label>
+                        <select class="form-select" id="updateType">
+                            <option value="NHAP_KHO">Nhập kho (+)</option>
+                            <option value="XUAT_KHO">Xuất kho (-)</option>
+                            <option value="DIEU_CHINH">Điều chỉnh (Set)</option>
+                            <option value="KIEM_KE">Kiểm kê (Set)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng:</label>
+                        <input type="number" class="form-control" id="updateQuantity" min="0" required>
+                        <small class="text-muted">
+                            <span id="quantityHelp">Nhập số lượng muốn thêm vào kho</span>
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lý do:</label>
+                        <textarea class="form-control" id="updateReason" rows="3" 
+                                  placeholder="Nhập lý do thay đổi tồn kho..."></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Thay đổi sẽ được ghi lại trong lịch sử tồn kho
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="submitUpdate()">
+                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Update Modal -->
+    <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Cập nhật hàng loạt
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Chức năng này cho phép cập nhật tồn kho cho nhiều sản phẩm cùng lúc
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại thay đổi:</label>
+                        <select class="form-select" id="bulkType">
+                            <option value="NHAP_KHO">Nhập kho (+)</option>
+                            <option value="DIEU_CHINH">Điều chỉnh (Set)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Danh sách cập nhật (JSON):</label>
+                        <textarea class="form-control" id="bulkData" rows="10" 
+                                  placeholder='[{"productId": 1, "quantity": 100}, {"productId": 2, "quantity": 50}]'></textarea>
+                        <small class="text-muted">Format: [{"productId": 1, "quantity": 100}, ...]</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lý do chung:</label>
+                        <input type="text" class="form-control" id="bulkReason" 
+                               placeholder="Nhập lý do...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="submitBulkUpdate()">
+                        <i class="fas fa-save me-2"></i>Cập nhật
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-history me-2"></i>Lịch sử tồn kho
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="historyContent">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const csrfToken = /*[[${_csrf.token}]]*/ '';
+        const csrfHeader = /*[[${_csrf.headerName}]]*/ '';
+
+        // Apply filters
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            let url = '/admin/inventory?';
+            if (search) url += 'search=' + encodeURIComponent(search) + '&';
+            if (status) url += 'status=' + status;
+            
+            window.location.href = url;
+        }
+
+        // Update type change handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.getElementById('updateType');
+            if (typeSelect) {
+                typeSelect.addEventListener('change', function() {
+                    const helpText = document.getElementById('quantityHelp');
+                    const type = this.value;
+                    
+                    switch(type) {
+                        case 'NHAP_KHO':
+                            helpText.textContent = 'Nhập số lượng muốn thêm vào kho';
+                            break;
+                        case 'XUAT_KHO':
+                            helpText.textContent = 'Nhập số lượng muốn xuất khỏi kho';
+                            break;
+                        case 'DIEU_CHINH':
+                        case 'KIEM_KE':
+                            helpText.textContent = 'Nhập số lượng tồn kho mới (set trực tiếp)';
+                            break;
+                    }
+                });
+            }
+        });
+
+        // Show update modal
+        function showUpdateModal(productId, productName, currentStock) {
+            document.getElementById('updateProductId').value = productId;
+            document.getElementById('updateProductName').value = productName;
+            document.getElementById('updateCurrentStock').value = currentStock;
+            document.getElementById('updateQuantity').value = '';
+            document.getElementById('updateReason').value = '';
+            document.getElementById('updateType').value = 'NHAP_KHO';
+            
+            const modal = new bootstrap.Modal(document.getElementById('updateStockModal'));
+            modal.show();
+        }
+
+        // Submit update
+        async function submitUpdate() {
+            const productId = document.getElementById('updateProductId').value;
+            const quantity = parseInt(document.getElementById('updateQuantity').value);
+            const type = document.getElementById('updateType').value;
+            const reason = document.getElementById('updateReason').value;
+            
+            if (!quantity || quantity < 0) {
+                alert('Vui lòng nhập số lượng hợp lệ!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/inventory/api/update?productId=${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity,
+                        loaiThayDoi: type,
+                        lyDo: reason
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        }
+
+        // Show bulk update modal
+        function showBulkUpdateModal() {
+            const modal = new bootstrap.Modal(document.getElementById('bulkUpdateModal'));
+            modal.show();
+        }
+
+        // Submit bulk update
+        async function submitBulkUpdate() {
+            const type = document.getElementById('bulkType').value;
+            const dataText = document.getElementById('bulkData').value;
+            const reason = document.getElementById('bulkReason').value;
+            
+            try {
+                const data = JSON.parse(dataText);
+                
+                const requests = data.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    loaiThayDoi: type,
+                    lyDo: reason
+                }));
+                
+                const response = await fetch('/admin/inventory/api/bulk-update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(requests)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lỗi parse JSON hoặc gọi API: ' + error.message);
+            }
+        }
+
+        // Show history
+        async function showHistory(productId) {
+            const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+            modal.show();
+            
+            const historyContent = document.getElementById('historyContent');
+            historyContent.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+            
+            try {
+                const response = await fetch(`/admin/inventory/api/history?productId=${productId}&size=10`);
+                const historyPage = await response.json();
+                
+                if (historyPage.content && historyPage.content.length > 0) {
+                    let html = '<div class="table-responsive"><table class="table table-sm">';
+                    html += '<thead><tr><th>Thời gian</th><th>Loại</th><th>Cũ</th><th>Mới</th><th>Thay đổi</th><th>Lý do</th></tr></thead>';
+                    html += '<tbody>';
+                    
+                    historyPage.content.forEach(item => {
+                        const changeClass = item.soLuongThayDoi > 0 ? 'text-success' : 'text-danger';
+                        const changeIcon = item.soLuongThayDoi > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                        
+                        html += `<tr>
+                            <td>${new Date(item.ngayThayDoi).toLocaleString('vi-VN')}</td>
+                            <td><span class="badge bg-info">${item.loaiThayDoi}</span></td>
+                            <td>${item.soLuongCu}</td>
+                            <td>${item.soLuongMoi}</td>
+                            <td class="${changeClass}">
+                                <i class="fas ${changeIcon}"></i> ${Math.abs(item.soLuongThayDoi)}
+                            </td>
+                            <td>${item.lyDo || '-'}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    historyContent.innerHTML = html;
+                } else {
+                    historyContent.innerHTML = '<p class="text-center text-muted">Chưa có lịch sử thay đổi</p>';
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+                historyContent.innerHTML = '<p class="text-center text-danger">Không thể tải lịch sử</p>';
+            }
+        }
+
+        // Search on Enter
+        document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    </script>
+</body>
+</html>
+

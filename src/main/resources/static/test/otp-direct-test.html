@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Direct Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3B82F6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            font-weight: 500;
+        }
+        .test-button:hover {
+            background: #2563EB;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>OTP Verification Page Test</h1>
+        
+        <div class="test-section">
+            <h3>1. Test OTP Page Trực Tiếp</h3>
+            <p>Click vào link dưới để test trang OTP:</p>
+            <a href="/otp-verification?email=test@example.com" class="test-button" target="_blank">
+                Test OTP Page
+            </a>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Test Flow Đăng Ký → OTP</h3>
+            <p>Để test flow hoàn chỉnh:</p>
+            <ol>
+                <li>Click vào link đăng ký bên dưới</li>
+                <li>Điền form đăng ký với email mới</li>
+                <li>Sau khi submit, bạn sẽ được chuyển đến trang OTP</li>
+            </ol>
+            <a href="/register" class="test-button" target="_blank">
+                Test Đăng Ký → OTP
+            </a>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Test Responsive Design</h3>
+            <p>Để test responsive design:</p>
+            <ul>
+                <li>Mở trang OTP trong tab mới</li>
+                <li>Thay đổi kích thước browser window</li>
+                <li>Test trên mobile (F12 → Device toolbar)</li>
+                <li>Kiểm tra OTP inputs hoạt động đúng</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Test OTP Behaviors</h3>
+            <p>Khi vào trang OTP, hãy test:</p>
+            <ul>
+                <li>✅ Auto-focus vào ô đầu tiên</li>
+                <li>✅ Nhập số → tự động nhảy sang ô tiếp theo</li>
+                <li>✅ Backspace → lùi về ô trước</li>
+                <li>✅ Paste 6 số → fill tất cả ô</li>
+                <li>✅ Countdown timer hoạt động</li>
+                <li>✅ Resend button có cooldown 60s</li>
+                <li>✅ Help accordion expand/collapse</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Troubleshooting</h3>
+            <p>Nếu gặp lỗi:</p>
+            <ul>
+                <li><strong>404 Not Found:</strong> Kiểm tra Spring Boot đang chạy</li>
+                <li><strong>Connection refused:</strong> Restart ứng dụng</li>
+                <li><strong>OTP page không load:</strong> Thử với email khác</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

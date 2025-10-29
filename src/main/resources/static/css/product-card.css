@@ -1,0 +1,641 @@
+/* ============================================
+   PRODUCT CARD COMPONENT - E-commerce Design Guide
+   Updated to match design specifications
+   ============================================ */
+
+:root {
+    /* Design Guide Variables */
+    --plp-img-ratio: 1 / 1; /* Square ratio as per design guide */
+    --plp-gutter-desktop: 24px;
+    --plp-gutter-tablet: 20px;
+    --plp-gutter-mobile: 16px;
+    --plp-row-gap-desktop: 28px;
+    --plp-row-gap-tablet: 24px;
+    --plp-row-gap-mobile: 20px;
+    
+    /* Design Guide Colors */
+    --badge-orange: #FF6B35;
+    --badge-orange-alt: #FF5722;
+    --brand-gray: #9E9E9E;
+    --brand-gray-alt: #757575;
+    --text-primary: #212121;
+    --text-primary-alt: #333333;
+    --price-red: #D32F2F;
+    --price-red-alt: #E53935;
+    --price-red-dark: #C62828;
+    --color-dot-border: #E0E0E0;
+    --color-dot-hover: #757575;
+    --card-bg: #FFFFFF;
+    --image-bg: #F5F5F5;
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --badge-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Grid Layout - Responsive Columns */
+.plp-products-grid {
+    display: grid;
+    gap: var(--plp-row-gap-desktop) var(--plp-gutter-desktop);
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* 5 columns for large screens (>1440px) */
+@media (min-width: 1440px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* 4 columns for desktop */
+@media (min-width: 1280px) and (max-width: 1439px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 3 columns for tablet */
+@media (min-width: 768px) and (max-width: 1279px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--plp-row-gap-tablet) var(--plp-gutter-tablet);
+    }
+}
+
+/* 2 columns for mobile */
+@media (max-width: 767px) {
+    .plp-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--plp-row-gap-mobile) var(--plp-gutter-mobile);
+    }
+}
+
+/* Single column for very small mobile */
+@media (max-width: 480px) {
+    .plp-products-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Product Card */
+.plp-product-card {
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-bg);
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    height: 100%;
+    max-width: 280px;
+    overflow: hidden;
+}
+
+.plp-product-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* Card Hover Effects */
+.plp-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+    border: 1px solid #EDEFF2;
+}
+
+/* Image Container - 1:1 square ratio */
+.plp-product-image {
+    position: relative;
+    aspect-ratio: 1 / 1; /* Square ratio as per design guide */
+    background: var(--image-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0;
+    width: 100%;
+    flex-shrink: 0;
+    display: block;
+    isolation: isolate;
+    padding: 20px; /* Design guide: 20-30px padding */
+}
+
+.plp-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.4s ease; /* Design guide: 0.4s ease */
+    position: relative;
+    z-index: 1;
+}
+
+/* Image Hover Effect */
+.plp-product-card:hover .plp-product-image img {
+    transform: scale(1.1); /* Design guide: 110% zoom */
+}
+
+/* Badge - Top Right (Design Guide Specs) */
+.plp-badge {
+    position: absolute;
+    top: 12px; /* Design guide: 12-16px from edge */
+    right: 12px;
+    padding: 6px 12px; /* Design guide: 6px 12px */
+    background: var(--badge-orange);
+    color: #FFFFFF;
+    font-size: 10px; /* Design guide: 10-11px */
+    font-weight: 700; /* Design guide: Bold */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 20px; /* Design guide: 20px border-radius */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    height: 24px;
+    box-shadow: var(--badge-shadow); /* Design guide: 0 2px 8px rgba(0,0,0,0.15) */
+}
+
+.plp-badge.new-arrival {
+    background: var(--badge-orange);
+}
+
+.plp-badge.discount {
+    background: var(--price-red);
+}
+
+.plp-badge.online-exclusive {
+    background: #3F6AD8;
+}
+
+/* Wishlist Button - Top Left on Hover */
+.plp-wishlist-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.plp-product-card:hover .plp-wishlist-btn {
+    opacity: 1;
+}
+
+.plp-wishlist-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+/* Product Info */
+.plp-product-info {
+    padding: 16px 20px 20px 20px; /* Design guide: 16-20px all sides */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+/* Brand Name (Design Guide Specs) */
+.plp-product-brand {
+    font-size: 11px; /* Design guide: 11-12px */
+    font-weight: 600; /* Design guide: SemiBold/Bold */
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--brand-gray); /* Design guide: #9E9E9E or #757575 */
+    margin-bottom: 6px; /* Design guide: 4-6px */
+    line-height: 16px;
+}
+
+/* Product Name (Design Guide Specs) */
+.plp-product-name {
+    font-size: 13px; /* Design guide: 13-14px */
+    font-weight: 500; /* Design guide: Medium */
+    line-height: 1.4; /* Design guide: 1.4-1.5 */
+    color: var(--text-primary); /* Design guide: #212121 or #333333 */
+    margin-bottom: 12px; /* Design guide: 12px */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Design guide: Max 2 lines */
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 36px; /* Approximate height for 2 lines */
+}
+
+/* Price Container (Design Guide Specs) */
+.plp-product-price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px; /* Design guide: 16px */
+    min-height: 40px;
+}
+
+.plp-price-original {
+    font-size: 14px;
+    color: var(--brand-gray);
+    text-decoration: line-through;
+    font-weight: 400;
+}
+
+.plp-price-current {
+    font-size: 16px; /* Design guide: 16-18px */
+    font-weight: 700; /* Design guide: Bold */
+    color: var(--price-red); /* Design guide: Red colors */
+}
+
+/* Color Selector Dots (Design Guide Specs) */
+.plp-swatches {
+    display: flex;
+    gap: 8px; /* Design guide: 8px between dots */
+    align-items: center;
+    margin-top: 0;
+}
+
+.plp-swatch {
+    width: 24px; /* Design guide: 24-28px diameter */
+    height: 24px;
+    border-radius: 50%; /* Design guide: 50% border-radius */
+    border: 2px solid var(--color-dot-border); /* Design guide: 2px solid #E0E0E0 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.plp-swatch:hover {
+    border-color: var(--color-dot-hover); /* Design guide: Border changes to #757575 */
+    transform: scale(1.1);
+}
+
+.plp-swatch.selected {
+    border: 3px solid var(--color-dot-hover); /* Design guide: Thicker border */
+    transform: scale(1.1);
+}
+
+.plp-swatch.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-dot-hover);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.plp-swatch svg {
+    width: 6px;
+    height: 6px;
+    color: var(--brand-gray);
+}
+
+.plp-swatch-more {
+    font-size: 11px;
+    color: var(--brand-gray);
+    font-weight: 500;
+}
+
+/* Quick Action Buttons - Single Pill Container */
+.quick-actions {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: calc(100% - 16px);
+    display: flex;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease-out, transform 180ms ease-out;
+    z-index: 10;
+    overflow: hidden;
+    height: 40px;
+}
+
+.plp-product-card:hover .quick-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.quick-action-btn {
+    width: 50%;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 90ms ease-out, color 90ms ease-out, transform 90ms ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex: 1;
+}
+
+/* Divider between buttons */
+.quick-actions::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background: #E5E7EB;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.quick-action-btn:hover {
+    background: #F8FAFC;
+    color: #111827;
+    transform: scale(1.04);
+}
+
+.quick-action-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.quick-action-btn.btn-options {
+    color: #334155;
+}
+
+.quick-action-btn.btn-options:hover {
+    color: #111827;
+}
+
+.quick-action-btn.btn-quick-view {
+    color: #3B82F6;
+}
+
+.quick-action-btn.btn-quick-view:hover {
+    color: #111827;
+}
+
+.quick-action-btn:active {
+    background: #EEF2FF;
+    color: #3B82F6;
+}
+
+.quick-action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3B82F6;
+    background: #F8FAFC;
+}
+
+.quick-action-btn:disabled {
+    background: transparent;
+    color: #94A3B8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.quick-action-btn:disabled svg {
+    opacity: 0.4;
+}
+
+/* Stagger animation for buttons */
+.quick-action-btn:nth-child(1) {
+    transition-delay: 0ms;
+}
+
+.quick-action-btn:nth-child(2) {
+    transition-delay: 40ms;
+}
+
+/* Ensure proper contrast on bright images */
+.plp-product-image:hover .quick-actions {
+    background: rgba(255, 255, 255, 0.98);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+/* Safari iOS clipping fix */
+@supports (-webkit-backdrop-filter: blur(4px)) {
+    .quick-actions {
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+    }
+}
+
+/* Firefox clipping fix */
+@-moz-document url-prefix() {
+    .plp-product-image {
+        -moz-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+}
+
+/* Ensure overlay matches image border radius */
+.plp-product-image .quick-actions {
+    border-radius: 12px;
+}
+
+/* Remove any inherited border/radius from buttons */
+.quick-action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3B82F6;
+    background: #F8FAFC;
+    border: none;
+    border-radius: 0;
+}
+
+/* Prevent overlay from exceeding image bounds */
+.plp-product-image {
+    contain: layout style paint;
+}
+
+/* Force overlay to stay within image bounds */
+.quick-actions {
+    max-width: calc(100% - 16px);
+    box-sizing: border-box;
+}
+
+/* Ensure proper z-index stacking */
+.plp-product-image .quick-actions {
+    z-index: 10;
+}
+
+/* Hardware acceleration for smooth clipping */
+.quick-actions {
+    will-change: opacity, transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+}
+
+/* Reset will-change after animation */
+.plp-product-card:hover .quick-actions {
+    will-change: auto;
+}
+
+/* Ensure overlay never exceeds image bounds */
+.plp-product-image {
+    isolation: isolate;
+}
+
+/* Prevent overlay from affecting other elements */
+.quick-actions {
+    pointer-events: auto;
+}
+
+/* Smooth transition for all states */
+.quick-action-btn {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure buttons don't have any inherited styles */
+.quick-action-btn,
+.quick-action-btn:active,
+.quick-action-btn:focus,
+.quick-action-btn:hover {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Only focus ring for accessibility */
+.quick-action-btn:focus {
+    box-shadow: 0 0 0 2px #3B82F6 !important;
+}
+
+/* Mobile touch targets */
+@media (max-width: 767px) {
+    .quick-actions {
+        bottom: 10px;
+        opacity: 1;
+        visibility: visible;
+        height: 44px;
+        transform: translateX(-50%) translateY(0);
+        width: calc(100% - 16px);
+    }
+    
+    .quick-action-btn {
+        height: 44px;
+    }
+    
+    .quick-action-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Mobile: Touch target minimum 44px */
+    .quick-action-btn {
+        min-height: 44px;
+    }
+    
+    .plp-swatch {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Mobile badge - smaller */
+    .plp-badge {
+        height: 22px;
+        font-size: 9px;
+        padding: 4px 8px;
+    }
+    
+    /* Mobile image padding adjustment */
+    .plp-product-image {
+        padding: 15px;
+    }
+}
+
+/* Out of Stock State */
+.plp-product-card.out-of-stock .plp-product-image::after {
+    content: 'HẾT HÀNG';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    z-index: 3;
+}
+
+.plp-product-card.out-of-stock .plp-product-image img {
+    opacity: 0.3;
+}
+
+.plp-product-card.out-of-stock .plp-swatches {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Skeleton Loading */
+.plp-product-skeleton {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.plp-product-skeleton .plp-product-image {
+    background: linear-gradient(90deg, #F6F7F9 25%, #E5E7EB 50%, #F6F7F9 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .plp-product-card,
+    .plp-product-image img,
+    .quick-actions,
+    .quick-action-btn,
+    .plp-swatch {
+        transition: none;
+        animation: none;
+    }
+    
+    .plp-product-card:hover {
+        transform: none;
+    }
+    
+    .plp-product-card:hover .plp-product-image img {
+        transform: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .plp-product-card {
+        border: 2px solid var(--text-primary);
+    }
+    
+    .plp-badge {
+        border: 2px solid #000;
+    }
+    
+    .plp-swatch {
+        border-width: 3px;
+    }
+}

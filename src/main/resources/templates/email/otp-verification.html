@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Xác nhận đăng ký - Activewear Store</title>
+  <!-- Preheader (ẩn) -->
+  <style>
+    .preheader { display:none !important; visibility:hidden; opacity:0; color:transparent; height:0; width:0; overflow:hidden; mso-hide:all; }
+    /* Outlook link fix */
+    a { text-decoration: none; }
+  </style>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f5f7fb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#1f2937;">
+  <!-- Preheader text: hiển thị trong preview của email client -->
+  <div class="preheader">
+    Mã OTP của bạn – có hiệu lực 10 phút.
+  </div>
+
+  <!-- Wrapper -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f7fb;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <!-- Container -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 40px rgba(15,23,42,0.08);">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background:#3b82f6; background:linear-gradient(135deg,#3b82f6 0%,#6366f1 100%); padding:32px 20px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <img src="https://dummyimage.com/48x48/ffffff/ffffff.png&text=+" width="48" height="48" alt="Activewear Store Logo" style="display:block; border:0; outline:none;">
+                    <div style="font-size:20px; line-height:24px; font-weight:700; color:#ffffff; margin-top:12px;">Activewear Store</div>
+                    <div style="font-size:13px; line-height:18px; color:#e0e7ff; margin-top:6px;">Xác nhận đăng ký tài khoản</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:24px 28px 16px 28px;">
+              <div style="font-size:18px; font-weight:700; margin:0 0 12px 0;">Xin chào,</div>
+              <div style="font-size:16px; line-height:24px; color:#1f2937;">
+                Cảm ơn bạn đã đăng ký tại <strong>Activewear Store</strong>. Vui lòng xác nhận tài khoản bằng mã OTP hoặc bấm nút bên dưới.
+              </div>
+            </td>
+          </tr>
+
+          <!-- Email line -->
+          <tr>
+            <td style="padding:0 28px 20px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+                <tr>
+                  <td style="padding:12px 16px;">
+                    <div style="font-size:15px; color:#334155;">
+                      Gửi tới email: <strong th:text="${userEmail}">user@example.com</strong>
+                    </div>
+                    <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                      Sai email? <a href="#" style="color:#2563eb; text-decoration:none;">Thay đổi</a>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- OTP block -->
+          <tr>
+            <td style="padding:0 28px 20px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f1f5f9; border:2px dashed #dbeafe; border-radius:12px;">
+                <tr>
+                  <td align="center" style="padding:24px;">
+                    <div style="font-family:'Courier New',monospace; font-size:36px; line-height:40px; font-weight:700; letter-spacing:10px; color:#2563eb;"
+                         th:text="${otpCode}">123456</div>
+                    <div style="font-size:13px; color:#64748b; margin-top:8px;">Nhập chính xác 6 chữ số vào trang xác nhận</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA Button -->
+          <tr>
+            <td align="center" style="padding:0 28px 20px 28px;">
+              <!-- Bulletproof button -->
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                href="${verifyUrl}" style="height:48px;v-text-anchor:middle;width:280px;" arcsize="10%" stroke="f" fillcolor="#3b82f6">
+                <w:anchorlock/>
+                <center style="color:#ffffff;font-family:Arial, sans-serif;font-size:16px;font-weight:bold;">
+                  Xác nhận tài khoản
+                </center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-- -->
+              <a th:href="${verifyUrl}"
+                 style="display:inline-block; background:#3b82f6; background:linear-gradient(135deg,#3b82f6 0%,#6366f1 100%);
+                        color:#ffffff; font-weight:700; font-size:16px; line-height:48px; height:48px; padding:0 24px;
+                        border-radius:10px; text-decoration:none; margin:0;">Xác nhận tài khoản</a>
+              <!--<![endif]-->
+              <div style="font-size:12px; color:#64748b; margin-top:12px;">
+                Hoặc dán liên kết này vào trình duyệt:
+              </div>
+              <div style="word-break:break-all; font-size:12px; color:#334155; margin-top:6px;"
+                   th:text="${verifyUrl}">https://activewear.example/verify?token=abc</div>
+            </td>
+          </tr>
+
+          <!-- Expiry -->
+          <tr>
+            <td style="padding:0 28px 20px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px;">
+                <tr>
+                  <td style="padding:14px 16px; font-size:14px; color:#9a3412;">
+                    ⏰ <strong>Mã có hiệu lực 10 phút</strong> kể từ khi email được gửi.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Security tips -->
+          <tr>
+            <td style="padding:0 28px 20px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#ecfeff; border:1px solid #cffafe; border-radius:10px;">
+                <tr>
+                  <td style="padding:14px 16px; font-size:14px; color:#0e7490;">
+                    🔒 <strong>Lưu ý bảo mật:</strong><br>
+                    • Không chia sẻ mã cho bất kỳ ai.<br>
+                    • Chúng tôi không bao giờ hỏi mã qua điện thoại.<br>
+                    • Nếu bạn không yêu cầu, hãy bỏ qua email này.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Help -->
+          <tr>
+            <td style="padding:0 28px 20px 28px; font-size:14px; color:#475569;">
+              Cần hỗ trợ? Liên hệ:
+              <a th:href="${'mailto:' + supportEmail}" th:text="${supportEmail}" style="color:#2563eb; font-weight:600; text-decoration:none;">
+                support@activewear.com
+              </a>
+              hoặc hotline
+              <span th:text="${supportPhone}">0123 456 789</span>.
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:4px 28px;">
+              <hr style="border:none; height:1px; background:#e2e8f0;">
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:16px 20px 24px 20px; font-size:12px; color:#94a3b8; line-height:18px;">
+              © <span th:text="${currentYear}">2025</span> Activewear Store — Cửa hàng trang phục thể thao hàng đầu Việt Nam<br>
+              Bạn nhận email này vì đã đăng ký tài khoản tại Activewear Store.
+            </td>
+          </tr>
+        </table>
+        <!-- /Container -->
+      </td>
+    </tr>
+  </table>
+  <!-- /Wrapper -->
+</body>
+</html>

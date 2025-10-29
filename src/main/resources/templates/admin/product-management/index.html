@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf?.token ?: ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName ?: 'X-CSRF-TOKEN'}"/>
+    <title>Quản lý sản phẩm - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: translateX(5px);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .product-card {
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #667eea !important;
+        }
+        .status-active {
+            color: #28a745;
+        }
+        .status-inactive {
+            color: #dc3545;
+        }
+        .bulk-actions {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .bulk-actions.show {
+            display: block;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9998;
+        }
+        
+        .toast {
+            min-width: 300px;
+        }
+        
+        /* Button loading state */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-white-50">Quản lý sản phẩm</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/product-management">
+                                <i class="fas fa-box me-2"></i>
+                                Quản lý sản phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/inventory">
+                                <i class="fas fa-warehouse me-2"></i>
+                                Quản lý tồn kho
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/promotion-management">
+                                <i class="fas fa-gift me-2"></i>
+                                Khuyến mãi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/sports">
+                                <i class="fas fa-futbol me-2"></i>
+                                Môn thể thao
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/banners">
+                                <i class="fas fa-image me-2"></i>
+                                Banner
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="fas fa-home me-2"></i>
+                                Về trang chủ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Quản lý sản phẩm</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a href="/admin/product-management/create" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>
+                            Thêm sản phẩm mới
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="bulk-actions" id="bulkActions">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3">
+                            <strong id="selectedCount">0</strong> sản phẩm được chọn
+                        </span>
+                        <button class="btn btn-sm btn-success me-2" onclick="bulkUpdateStatus(true)">
+                            <i class="fas fa-check me-1"></i>
+                            Kích hoạt
+                        </button>
+                        <button class="btn btn-sm btn-warning me-2" onclick="bulkUpdateStatus(false)">
+                            <i class="fas fa-times me-1"></i>
+                            Vô hiệu hóa
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="bulkDelete()">
+                            <i class="fas fa-trash me-1"></i>
+                            Xóa
+                        </button>
+                        <button class="btn btn-sm btn-secondary ms-auto" onclick="clearSelection()">
+                            <i class="fas fa-times me-1"></i>
+                            Bỏ chọn
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form id="searchForm" method="get" action="/admin/product-management">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control" name="keyword" 
+                                           th:value="${keyword}" placeholder="Tên sản phẩm..."
+                                           onkeyup="debouncedSearch()">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Danh mục</label>
+                                    <select class="form-select" name="categoryId">
+                                        <option value="">Tất cả</option>
+                                        <option th:each="category : ${categories}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.ten}"
+                                                th:selected="${categoryId == category.id}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Thương hiệu</label>
+                                    <select class="form-select" name="brandId">
+                                        <option value="">Tất cả</option>
+                                        <option th:each="brand : ${brands}" 
+                                                th:value="${brand.id}" 
+                                                th:text="${brand.ten}"
+                                                th:selected="${brandId == brand.id}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Môn thể thao</label>
+                                    <select class="form-select" name="sportId">
+                                        <option value="">Tất cả</option>
+                                        <option th:each="sport : ${sports}" 
+                                                th:value="${sport.id}" 
+                                                th:text="${sport.ten}"
+                                                th:selected="${sportId == sport.id}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select class="form-select" name="status">
+                                        <option value="">Tất cả</option>
+                                        <option value="active" th:selected="${status == 'active'}">Hoạt động</option>
+                                        <option value="inactive" th:selected="${status == 'inactive'}">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <a href="/admin/product-management" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Xóa bộ lọc
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Danh sách sản phẩm
+                                <span class="badge bg-primary ms-2" th:text="${products.totalElements}">0</span>
+                            </h5>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                <label class="form-check-label" for="selectAll">
+                                    Chọn tất cả
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th width="50">
+                                            <input type="checkbox" id="selectAllHeader" onchange="toggleSelectAll()">
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Hình ảnh</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Danh mục</th>
+                                        <th>Thương hiệu</th>
+                                        <th>Giá</th>
+                                        <th>Tồn kho</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="product : ${products.content}" th:data-product-id="${product.id}">
+                                        <td>
+                                            <input type="checkbox" class="product-checkbox" th:value="${product.id}" onchange="updateSelection()">
+                                        </td>
+                                        <td th:text="${product.id}">1</td>
+                                        <td>
+                                            <img th:src="${product.anhChinh != null and !#strings.isEmpty(product.anhChinh) ? product.anhChinh : '/images/no-image.svg'}" 
+                                                 th:alt="${product.ten}"
+                                                 class="img-thumbnail" 
+                                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                                 onerror="if(this.src !== '/images/no-image.svg') this.src='/images/no-image.svg'">
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong th:text="${product.ten}">Tên sản phẩm</strong>
+                                                <br>
+                                                <small class="text-muted" th:text="${product.maSanPham}">Mã SP</small>
+                                            </div>
+                                        </td>
+                                        <td th:text="${product.danhMucTen}">Danh mục</td>
+                                        <td th:text="${product.thuongHieuTen}">Thương hiệu</td>
+                                        <td>
+                                            <span th:text="${#numbers.formatDecimal(product.gia, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+                                        </td>
+                                        <td>
+                                            <span th:class="${product.soLuongTon > 0 ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${product.soLuongTon}">0</span>
+                                        </td>
+                                        <td class="status-cell">
+                                            <span th:if="${product.hoatDong}" class="badge bg-success status-badge">
+                                                <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                            </span>
+                                            <span th:unless="${product.hoatDong}" class="badge bg-danger status-badge">
+                                                <i class="fas fa-times-circle me-1"></i>Không hoạt động
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/admin/product-management/{id}(id=${product.id})}" 
+                                                   class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/product-management/{id}/edit(id=${product.id})}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a th:href="@{/admin/product/{id}/variants(id=${product.id})}" 
+                                                   class="btn btn-sm btn-outline-secondary" title="Quản lý biến thể">
+                                                    <i class="fas fa-layer-group"></i>
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-warning"
+                                                        th:onclick="'toggleStatus(' + ${product.id} + ')'" 
+                                                        th:title="${product.hoatDong ? 'Vô hiệu hóa sản phẩm' : 'Kích hoạt sản phẩm'}">
+                                                    <i th:class="${product.hoatDong ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
+                                                </button>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        th:onclick="'deleteProduct(' + ${product.id} + ')'" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${products.content.isEmpty()}">
+                                        <td colspan="10" class="text-center text-muted py-4">
+                                            <i class="fas fa-box fa-2x mb-3"></i>
+                                            <p>Không có sản phẩm nào</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        
+                        <!-- Pagination -->
+                        <nav th:if="${products.totalPages > 1}">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${!products.hasPrevious()} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/product-management(page=${products.number - 1}, keyword=${keyword != null and !keyword.isEmpty() ? keyword : null}, categoryId=${categoryId}, brandId=${brandId}, sportId=${sportId}, status=${status != null and !status.isEmpty() ? status : null})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                
+                                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, products.totalPages - 1)}"
+                                    th:classappend="${pageNum == products.number} ? 'active'">
+                                    <a class="page-link" 
+                                       th:href="@{/admin/product-management(page=${pageNum}, keyword=${keyword != null and !keyword.isEmpty() ? keyword : null}, categoryId=${categoryId}, brandId=${brandId}, sportId=${sportId}, status=${status != null and !status.isEmpty() ? status : null})}"
+                                       th:text="${pageNum + 1}">1</a>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${!products.hasNext()} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/product-management(page=${products.number + 1}, keyword=${keyword != null and !keyword.isEmpty() ? keyword : null}, categoryId=${categoryId}, brandId=${brandId}, sportId=${sportId}, status=${status != null and !status.isEmpty() ? status : null})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Đang xử lý...</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmButton">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Loading and Toast functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        function showSuccessToast(message) {
+            showToast(message, 'success');
+        }
+        
+        function showErrorToast(message) {
+            showToast(message, 'danger');
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: true,
+                delay: 3000
+            });
+            
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
+        
+        let selectedProducts = new Set();
+        let searchTimeout;
+        
+        // Debounce search để tránh gọi API quá nhiều
+        function debounceSearch(func, delay) {
+            return function(...args) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+        
+        // Search function với debounce
+        const debouncedSearch = debounceSearch(function() {
+            const form = document.getElementById('searchForm');
+            if (form) {
+                form.submit();
+            }
+        }, 500); // 500ms delay
+        
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.product-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                if (selectAll.checked) {
+                    selectedProducts.add(parseInt(checkbox.value));
+                } else {
+                    selectedProducts.delete(parseInt(checkbox.value));
+                }
+            });
+            
+            updateSelection();
+        }
+        
+        function updateSelection() {
+            selectedProducts.clear();
+            const checkboxes = document.querySelectorAll('.product-checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                selectedProducts.add(parseInt(checkbox.value));
+            });
+            
+            const selectedCount = selectedProducts.size;
+            document.getElementById('selectedCount').textContent = selectedCount;
+            
+            const bulkActions = document.getElementById('bulkActions');
+            if (selectedCount > 0) {
+                bulkActions.classList.add('show');
+            } else {
+                bulkActions.classList.remove('show');
+            }
+            
+            // Update select all checkbox
+            const selectAll = document.getElementById('selectAll');
+            const totalCheckboxes = document.querySelectorAll('.product-checkbox').length;
+            selectAll.checked = selectedCount === totalCheckboxes && totalCheckboxes > 0;
+        }
+        
+        function clearSelection() {
+            selectedProducts.clear();
+            document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('selectAll').checked = false;
+            updateSelection();
+        }
+        
+        function updateProductStatusInTable(productId) {
+            // Tìm dòng sản phẩm trong bảng
+            const productRow = document.querySelector(`tr[data-product-id="${productId}"]`);
+            if (productRow) {
+                // Tìm cột trạng thái
+                const statusCell = productRow.querySelector('.status-cell');
+                const statusBadge = productRow.querySelector('.status-badge');
+                const toggleButton = productRow.querySelector(`button[onclick*="toggleStatus(${productId})"]`);
+                
+                if (statusCell && statusBadge && toggleButton) {
+                    // Toggle trạng thái hiển thị
+                    const isActive = statusBadge.classList.contains('bg-success');
+                    if (isActive) {
+                        statusBadge.className = 'badge bg-danger status-badge';
+                        statusBadge.textContent = 'Không hoạt động';
+                        toggleButton.innerHTML = '<i class="fas fa-toggle-off"></i>';
+                        toggleButton.title = 'Kích hoạt sản phẩm';
+                    } else {
+                        statusBadge.className = 'badge bg-success status-badge';
+                        statusBadge.textContent = 'Hoạt động';
+                        toggleButton.innerHTML = '<i class="fas fa-toggle-on"></i>';
+                        toggleButton.title = 'Vô hiệu hóa sản phẩm';
+                    }
+                }
+            }
+        }
+        
+        function toggleStatus(productId) {
+            document.getElementById('confirmMessage').textContent = 'Bạn có chắc chắn muốn thay đổi trạng thái sản phẩm này?';
+            document.getElementById('confirmButton').onclick = function() {
+                // Hiển thị loading
+                showLoading();
+                
+                // Lấy CSRF token
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+                
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (csrfToken) {
+                    headers[csrfHeader] = csrfToken;
+                }
+                
+                fetch(`/admin/product-management/${productId}/toggle-status`, {
+                    method: 'POST',
+                    headers: headers
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Cập nhật trạng thái trực tiếp trên trang thay vì reload
+                        updateProductStatusInTable(productId);
+                        showSuccessToast('Cập nhật trạng thái thành công!');
+                    } else {
+                        showErrorToast('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast('Có lỗi xảy ra khi cập nhật trạng thái');
+                })
+                .finally(() => {
+                    hideLoading();
+                });
+            };
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+
+        function deleteProduct(productId) {
+            document.getElementById('confirmMessage').textContent = 'Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác!';
+            document.getElementById('confirmButton').onclick = function() {
+                // Lấy CSRF token
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+                
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (csrfToken) {
+                    headers[csrfHeader] = csrfToken;
+                }
+                
+                fetch(`/admin/product-management/${productId}/delete`, {
+                    method: 'POST',
+                    headers: headers
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                });
+            };
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+        
+        function bulkUpdateStatus(status) {
+            if (selectedProducts.size === 0) return;
+            
+            const action = status ? 'kích hoạt' : 'vô hiệu hóa';
+            document.getElementById('confirmMessage').textContent = `Bạn có chắc chắn muốn ${action} ${selectedProducts.size} sản phẩm đã chọn?`;
+            document.getElementById('confirmButton').onclick = function() {
+                // Lấy CSRF token
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+                
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (csrfToken) {
+                    headers[csrfHeader] = csrfToken;
+                }
+                
+                fetch('/admin/product-management/bulk-update-status', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        productIds: Array.from(selectedProducts),
+                        status: status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                });
+            };
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+        
+        function bulkDelete() {
+            if (selectedProducts.size === 0) return;
+            
+            document.getElementById('confirmMessage').textContent = `Bạn có chắc chắn muốn xóa ${selectedProducts.size} sản phẩm đã chọn? Hành động này không thể hoàn tác!`;
+            document.getElementById('confirmButton').onclick = function() {
+                // Lấy CSRF token
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+                
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (csrfToken) {
+                    headers[csrfHeader] = csrfToken;
+                }
+                
+                fetch('/admin/product-management/bulk-delete', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(Array.from(selectedProducts))
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                });
+            };
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+
+        // Hiển thị thông báo thành công
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success')) {
+            let message = '';
+            switch(urlParams.get('success')) {
+                case 'created':
+                    message = 'Sản phẩm đã được tạo thành công!';
+                    break;
+                case 'updated':
+                    message = 'Sản phẩm đã được cập nhật thành công!';
+                    break;
+                case 'deleted':
+                    message = 'Sản phẩm đã được xóa thành công!';
+                    break;
+                case 'status_updated':
+                    message = 'Trạng thái sản phẩm đã được cập nhật!';
+                    break;
+            }
+            if (message) {
+                alert(message);
+            }
+        }
+    </script>
+</body>
+</html>

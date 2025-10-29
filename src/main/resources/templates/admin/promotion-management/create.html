@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf?.token ?: ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName ?: 'X-CSRF-TOKEN'}"/>
+    <title>Tạo khuyến mãi mới - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: translateX(5px);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .form-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #667eea !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/product-management">
+                                <i class="fas fa-box me-2"></i>Quản lý sản phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/inventory">
+                                <i class="fas fa-warehouse me-2"></i>
+                                Quản lý tồn kho
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/promotion-management">
+                                <i class="fas fa-gift me-2"></i>Khuyến mãi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/orders">
+                                <i class="fas fa-shopping-cart me-2"></i>Quản lý đơn hàng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/users">
+                                <i class="fas fa-users me-2"></i>Quản lý người dùng
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-plus text-primary me-2"></i>Tạo khuyến mãi mới
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a href="/admin/promotion-management" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Error messages -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Form -->
+                <form th:action="@{/admin/promotion-management/create}" th:object="${promotion}" method="post">
+                    <div class="form-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-info-circle text-primary me-2"></i>Thông tin cơ bản
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ten" class="form-label">
+                                        Tên khuyến mãi <span class="required">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="ten" th:field="*{ten}" 
+                                           placeholder="Nhập tên khuyến mãi" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('ten')}" 
+                                         th:errors="*{ten}"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="loai" class="form-label">
+                                        Loại khuyến mãi <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="loai" name="loai" required>
+                                        <option value="">Chọn loại khuyến mãi</option>
+                                        <option value="PHAN_TRAM">Giảm phần trăm</option>
+                                        <option value="SO_TIEN">Giảm số tiền</option>
+                                        <option value="FREE_SHIP">Miễn phí vận chuyển</option>
+                                        <option value="TANG_KEM">Tặng kèm</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="moTa" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="moTa" th:field="*{moTa}" rows="3" 
+                                      placeholder="Mô tả chi tiết về khuyến mãi"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ngayBatDau" class="form-label">
+                                        Ngày bắt đầu <span class="required">*</span>
+                                    </label>
+                                    <input type="datetime-local" class="form-control" id="ngayBatDau" 
+                                           th:field="*{ngayBatDau}" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('ngayBatDau')}" 
+                                         th:errors="*{ngayBatDau}"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ngayKetThuc" class="form-label">
+                                        Ngày kết thúc <span class="required">*</span>
+                                    </label>
+                                    <input type="datetime-local" class="form-control" id="ngayKetThuc" 
+                                           th:field="*{ngayKetThuc}" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('ngayKetThuc')}" 
+                                         th:errors="*{ngayKetThuc}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-percent text-primary me-2"></i>Giá trị khuyến mãi
+                        </h4>
+                        
+                        <div class="mb-3" id="discount-value-section">
+                            <label for="giaTri" class="form-label">
+                                Giá trị khuyến mãi <span class="required">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="giaTri" name="giaTri" 
+                                   min="0" step="0.01" required
+                                   placeholder="Nhập giá trị khuyến mãi">
+                            <div class="form-text">
+                                <span id="giaTri-help">Với loại "Giảm phần trăm": nhập số từ 1-100. Với loại "Giảm số tiền": nhập số tiền giảm (VNĐ)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="soLuongSuDung" class="form-label">
+                                        Số lượng đã sử dụng
+                                    </label>
+                                    <input type="number" class="form-control" id="soLuongSuDung" name="soLuongSuDung" 
+                                           value="0" min="0" placeholder="Số lượng đã sử dụng">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="soLuongToiDa" class="form-label">
+                                        Số lượng tối đa
+                                    </label>
+                                    <input type="number" class="form-control" id="soLuongToiDa" name="soLuongToiDa" 
+                                           min="1" placeholder="Để trống = không giới hạn">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-target text-primary me-2"></i>Áp dụng cho
+                        </h4>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Chọn sản phẩm áp dụng</label>
+                            <select class="form-select" id="productSelect" name="sanPhamIds" multiple>
+                                <option th:each="product : ${products}" 
+                                        th:value="${product.id}" 
+                                        th:text="${product.ten}">
+                                </option>
+                            </select>
+                            <small class="form-text text-muted">Giữ Ctrl để chọn nhiều sản phẩm</small>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-cog text-primary me-2"></i>Cài đặt
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="hoatDong" name="hoatDong" checked>
+                                    <label class="form-check-label" for="hoatDong">
+                                        Kích hoạt khuyến mãi
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/promotion-management" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Tạo khuyến mãi
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle promotion type change
+        document.getElementById('loai').addEventListener('change', function() {
+            const type = this.value;
+            const giaTriInput = document.getElementById('giaTri');
+            const giaTriHelp = document.getElementById('giaTri-help');
+            
+            if (type === 'PHAN_TRAM') {
+                giaTriInput.setAttribute('max', '100');
+                giaTriInput.setAttribute('step', '1');
+                giaTriHelp.textContent = 'Với loại "Giảm phần trăm": nhập số từ 1-100';
+            } else if (type === 'SO_TIEN') {
+                giaTriInput.removeAttribute('max');
+                giaTriInput.setAttribute('step', '1000');
+                giaTriHelp.textContent = 'Với loại "Giảm số tiền": nhập số tiền giảm (VNĐ)';
+            } else if (type === 'FREE_SHIP' || type === 'TANG_KEM') {
+                giaTriInput.value = '0';
+                giaTriInput.disabled = true;
+                giaTriHelp.textContent = 'Loại này không cần giá trị giảm';
+            } else {
+                giaTriInput.disabled = false;
+                giaTriHelp.textContent = 'Với loại "Giảm phần trăm": nhập số từ 1-100. Với loại "Giảm số tiền": nhập số tiền giảm (VNĐ)';
+            }
+        });
+        
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().slice(0, 16);
+        document.getElementById('ngayBatDau').setAttribute('min', today);
+        document.getElementById('ngayKetThuc').setAttribute('min', today);
+        
+        // Update end date minimum when start date changes
+        document.getElementById('ngayBatDau').addEventListener('change', function() {
+            document.getElementById('ngayKetThuc').setAttribute('min', this.value);
+        });
+        
+        // Form validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            const promotionType = document.getElementById('loai').value;
+            const giaTriInput = document.getElementById('giaTri');
+            
+            // Validate discount value based on type
+            if (promotionType === 'PHAN_TRAM') {
+                if (!giaTriInput.value || giaTriInput.value <= 0 || giaTriInput.value > 100) {
+                    alert('Vui lòng nhập phần trăm giảm hợp lệ (1-100%)');
+                    event.preventDefault();
+                    return;
+                }
+            } else if (promotionType === 'SO_TIEN') {
+                if (!giaTriInput.value || giaTriInput.value <= 0) {
+                    alert('Vui lòng nhập số tiền giảm hợp lệ');
+                    event.preventDefault();
+                    return;
+                }
+            }
+            
+            // Validate date range
+            const startDate = new Date(document.getElementById('ngayBatDau').value);
+            const endDate = new Date(document.getElementById('ngayKetThuc').value);
+            
+            if (endDate <= startDate) {
+                alert('Ngày kết thúc phải sau ngày bắt đầu');
+                event.preventDefault();
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

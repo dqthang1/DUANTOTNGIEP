@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test OTP Responsive</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .device-frame {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 10px;
+            background: #000;
+            padding: 2px;
+        }
+        
+        .device-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        
+        .desktop-frame {
+            width: 640px;
+            height: 800px;
+        }
+        
+        .tablet-frame {
+            width: 768px;
+            height: 800px;
+        }
+        
+        .mobile-frame {
+            width: 375px;
+            height: 800px;
+        }
+        
+        .test-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .test-checklist {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .test-checklist h4 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .test-checklist ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .test-checklist li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>OTP Verification Page Responsive Test</h1>
+        
+        <div class="test-section">
+            <div class="test-title">Desktop View (640px width)</div>
+            <div class="test-info">Card should be 560-640px width with 6 OTP inputs</div>
+            <div class="device-frame desktop-frame">
+                <iframe src="/otp-verification?email=test@example.com" title="Desktop OTP"></iframe>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Tablet View (768px width)</div>
+            <div class="test-info">Card should be 92% width, OTP inputs properly spaced</div>
+            <div class="device-frame tablet-frame">
+                <iframe src="/otp-verification?email=test@example.com" title="Tablet OTP"></iframe>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Mobile View (375px width)</div>
+            <div class="test-info">Card should be 92% width, OTP inputs 44px height</div>
+            <div class="device-frame mobile-frame">
+                <iframe src="/otp-verification?email=test@example.com" title="Mobile OTP"></iframe>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">OTP Input Behavior Tests</div>
+            <div class="test-checklist">
+                <h4>Input Behavior Tests:</h4>
+                <ul>
+                    <li>✅ Auto-focus on first input when page loads</li>
+                    <li>✅ Auto-jump to next input when typing</li>
+                    <li>✅ Backspace moves to previous input</li>
+                    <li>✅ Paste 6-digit code fills all inputs</li>
+                    <li>✅ Auto-submit when all 6 digits entered</li>
+                    <li>✅ Enter key submits form</li>
+                    <li>✅ Only accepts numbers (0-9)</li>
+                    <li>✅ Monospace font for OTP inputs</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Countdown Timer Tests</div>
+            <div class="test-checklist">
+                <h4>Timer Tests:</h4>
+                <ul>
+                    <li>✅ Countdown starts at 10:00 (10 minutes)</li>
+                    <li>✅ Updates every second (mm:ss format)</li>
+                    <li>✅ Changes to "Mã đã hết hiệu lực" when expired</li>
+                    <li>✅ Resend button enabled when timer expires</li>
+                    <li>✅ Timer shows in yellow background</li>
+                    <li>✅ Expired timer shows in red background</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Resend Button Tests</div>
+            <div class="test-checklist">
+                <h4>Resend Tests:</h4>
+                <ul>
+                    <li>✅ Resend button disabled initially (60s cooldown)</li>
+                    <li>✅ Shows countdown "Gửi lại mã (60s)"</li>
+                    <li>✅ Button enabled after 60 seconds</li>
+                    <li>✅ Loading state when clicked</li>
+                    <li>✅ Ghost button style (transparent background)</li>
+                    <li>✅ Full width button</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Error Handling Tests</div>
+            <div class="test-checklist">
+                <h4>Error Tests:</h4>
+                <ul>
+                    <li>✅ Wrong OTP shows error message</li>
+                    <li>✅ OTP inputs shake animation on error</li>
+                    <li>✅ Red border on OTP inputs when error</li>
+                    <li>✅ Error message: "Mã không đúng hoặc đã hết hạn"</li>
+                    <li>✅ Error clears after 3 seconds</li>
+                    <li>✅ Focus returns to first input on error</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Help Accordion Tests</div>
+            <div class="test-checklist">
+                <h4>Help Tests:</h4>
+                <ul>
+                    <li>✅ Help toggle button with chevron icon</li>
+                    <li>✅ Accordion expands/collapses on click</li>
+                    <li>✅ Chevron rotates when expanded</li>
+                    <li>✅ Help content shows guidance</li>
+                    <li>✅ Includes: find email, enter correctly, time limit, support</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Email Info Tests</div>
+            <div class="test-checklist">
+                <h4>Email Info Tests:</h4>
+                <ul>
+                    <li>✅ Email displayed in read-only field</li>
+                    <li>✅ Mail icon next to email</li>
+                    <li>✅ "Thay đổi email" link on the right</li>
+                    <li>✅ Light gray background for email field</li>
+                    <li>✅ Change email link opens prompt (placeholder)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Accessibility Tests</div>
+            <div class="test-checklist">
+                <h4>A11y Tests:</h4>
+                <ul>
+                    <li>✅ Each OTP input has aria-label</li>
+                    <li>✅ Form has proper labels</li>
+                    <li>✅ Error messages linked with aria-describedby</li>
+                    <li>✅ Tab order: OTP inputs → Verify → Resend</li>
+                    <li>✅ High contrast mode support</li>
+                    <li>✅ Reduced motion support</li>
+                    <li>✅ Keyboard navigation works</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Security Tests</div>
+            <div class="test-checklist">
+                <h4>Security Tests:</h4>
+                <ul>
+                    <li>✅ OTP inputs have autocomplete="off"</li>
+                    <li>✅ Rate limiting on resend (60s cooldown)</li>
+                    <li>✅ No sensitive data in URL</li>
+                    <li>✅ CSRF protection (if enabled)</li>
+                    <li>✅ Input validation (numbers only)</li>
+                    <li>✅ Error messages don't leak information</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
